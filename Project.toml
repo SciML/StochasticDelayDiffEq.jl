@@ -2,3 +2,7 @@ name = "StochasticDelayDiffEq"
 uuid = "29a0d76e-afc8-11e9-03a4-eda52ae4b960"
 authors = ["Henrik Sykora <henrik1991@gmail.com>"]
 version = "0.1.0"
+
+[deps]
+DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
