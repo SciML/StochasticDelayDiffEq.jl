@@ -1,3 +1,21 @@
+abstract type AbstractSDDEFunction{iip} <: AbstractDiffEqFunction{iip} end
+
+struct SDDEFunction{iip,F,G,TMM,Ta,Tt,TJ,JP,TW,TWt,TPJ,S,GG,TCV} <: AbstractSDDEFunction{iip}
+  f::F
+  g::G
+  mass_matrix::TMM
+  analytic::Ta
+  tgrad::Tt
+  jac::TJ
+  jac_prototype::JP
+  Wfact::TW
+  Wfact_t::TWt
+  paramjac::TPJ
+  ggprime::GG
+  syms::S
+  colorvec::TCV
+end
+
 function SDDEFunction{iip,true}(f,g;
                  mass_matrix=I,
                  analytic=nothing,
@@ -116,6 +134,7 @@ function Base.convert(::Type{SDDEFunction},f,g)
   SDDEFunction(f,g;analytic=analytic,tgrad=tgrad,jac=jac,Wfact=Wfact,
               Wfact_t=Wfact_t,paramjac=paramjac,syms=syms,colorvec=colorvec)
 end
+
 function Base.convert(::Type{SDDEFunction{iip}},f,g) where iip
   if __has_analytic(f)
     analytic = f.analytic
