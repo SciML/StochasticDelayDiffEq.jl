@@ -13,9 +13,9 @@ mutable struct HistorySDEIntegrator{algType,IIP,uType,tType,SolType,CacheType} <
   end
 
 mutable struct
-    SDDEIntegrator{algType,IIP,uType,uEltype,tType,P,eigenType,tTypeNoUnits,uEltypeNoUnits,randType,rateType,solType,cacheType,F4,F5,OType,noiseType,EventErrorType,CallbackCacheType,H,IType} <: AbstractSDDEIntegrator{algType,IIP,uType,tType}
-    f::F4
-    g::F5
+    SDDEIntegrator{algType,IIP,uType,uEltype,tType,P,eigenType,tTypeNoUnits,uEltypeNoUnits,randType,rateType,solType,cacheType,F,G,OType,noiseType,EventErrorType,CallbackCacheType,H,IType} <: AbstractSDDEIntegrator{algType,IIP,uType,tType}
+    f::F
+    g::G
     noise::noiseType
     uprev::uType
     tprev::tType
@@ -62,7 +62,7 @@ mutable struct
     qold::tTypeNoUnits
     q11::tTypeNoUnits
     history::H
-    # integrator::IType # TODO history integrator from DDEIntegrator
+    integrator::IType # history integrator
   end
   
   function (integrator::SDDEIntegrator)(t, deriv::Type=Val{0}; idxs=nothing)

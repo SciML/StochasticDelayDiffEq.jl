@@ -195,7 +195,7 @@ function DiffEqBase.__init(
     end
 
     QT = tTypeNoUnits <: Integer ? typeof(qmin) : tTypeNoUnits
-  
+    
     if !(uType <: AbstractArray)
       rand_prototype = zero(u/u) # Strip units and type info
       randType = typeof(rand_prototype)
@@ -259,13 +259,6 @@ function DiffEqBase.__init(
       end
     end
 
-    # create a history function
-    history = build_history_function(prob, alg, reltol_internal,
-                                    rate_prototype, noise_rate_prototype, W, _seed, dense;
-                                    dt = dt, adaptive = adaptive,
-                                    internalnorm = internalnorm)
-    f_with_history, g_with_history = wrap_functions_and_history(f, g, history)
-
     ts, timeseries, saveiter = solution_arrays(u, tspan, rate_prototype,
                     timeseries_init = timeseries_init, ts_init = ts_init, save_idxs = save_idxs, save_start = save_start)
 
@@ -288,23 +281,18 @@ function DiffEqBase.__init(
     if save_start && typeof(getalg(alg)) <: StochasticDiffEqCompositeAlgorithm  # TODO: alg.alg
       copyat_or_push!(alg_choice,1,1)
     end
-    # if save_start
-    #   saveiter = 1 # Starts at 1 so first save is at 2
-    #   copyat_or_push!(ts,1,t)
-    #   if save_idxs === nothing
-    #     copyat_or_push!(timeseries,1,u)
-    #   else
-    #     copyat_or_push!(timeseries,1,u_initial,Val{false})
-    #   end
-      # if typeof(alg) <: StochasticDiffEqCompositeAlgorithm  # TODO: alg.alg
-      #   copyat_or_push!(alg_choice,1,1)
-      # end
-    # else
-    #   saveiter = 0
-    # end
-  
+
+    # create a history function
+    history = build_history_function(prob, alg, reltol_internal,
+                                    rate_prototype, noise_rate_prototype, W, _seed, dense;
+                                    dt = dt, adaptive = adaptive,
+                                    internalnorm = internalnorm)
+    f_with_history, g_with_history = wrap_functions_and_history(f, g, history)
+
+    sde_integrator = history.integrator;
+
     cache = StochasticDiffEq.alg_cache(getalg(alg),prob,u,W.dW,W.dZ,p,rate_prototype,noise_rate_prototype,uEltypeNoUnits,uBottomEltypeNoUnits,tTypeNoUnits,uprev,f,t,dt,Val{isinplace(prob)})
-  
+    
     id = StochasticDiffEq.LinearInterpolationData(timeseries,ts)
   
     opts = StochasticDiffEq.SDEOptions(maxiters,save_everystep,
@@ -330,23 +318,30 @@ function DiffEqBase.__init(
   
     # if typeof(alg) <: Union{StochasticDiffEqCompositeAlgorithm,
                             # StochasticDiffEqRODECompositeAlgorithm}
+
     if typeof(getalg(alg)) <: StochasticDiffEqCompositeAlgorithm  # TODO: alg.alg
       # TODO sol = DiffEqBase.build_solution(prob,alg,ts,timeseries,W=W,
-      sol = build_solution(prob,alg,ts,timeseries,W=W,
+      # sol = build_solution(prob,alg,ts,timeseries,W=W,
+      # TODO: DISCONNECT!!!!
+      sol = build_solution(prob,alg,sde_integrator.sol.t,sde_integrator.sol.u,W=W,
                                       destats = DiffEqBase.DEStats(0),
                                       calculate_error = false, alg_choice=alg_choice,
                                       interp = id, dense = dense, seed = _seed)
+    # separate statistics of the integrator and the history
     else
     # TODO  sol = DiffEqBase.build_solution(prob,alg,ts,timeseries,W=W,
-      sol = build_solution(prob,alg,ts,timeseries,W=W,
+      # sol = build_solution(prob,alg,ts,timeseries,W=W,
+      # TODO: DISCONNECT!!!!
+      sol = build_solution(prob,alg,sde_integrator.sol.t,sde_integrator.sol.u,W=W,
                                       destats = DiffEqBase.DEStats(0),
                                       calculate_error = false,
                                       interp = id, dense = dense, seed = _seed)
+    # separate statistics of the integrator and the history
     end
   
     if recompile_flag == true
-      FType = typeof(f)
-      GType = typeof(g)
+      FType = typeof(f_with_history)
+      GType = typeof(g_with_history)
       SolType = typeof(sol)
       cacheType = typeof(cache)
     else
@@ -375,21 +370,33 @@ function DiffEqBase.__init(
     success_iter = 0
     q = tTypeNoUnits(1)
   
-    integrator =    SDEIntegrator{typeof(alg),isinplace(prob),uType,
-                    uBottomEltype,tType,typeof(p),
-                    typeof(eigen_est),QT,
-                    uEltypeNoUnits,typeof(W),rateType,typeof(sol),typeof(cache),
-                    FType,GType,typeof(opts),typeof(noise),typeof(last_event_error),typeof(callback_cache)}(
-                    f,g,noise,uprev,tprev,t,u,p,tType(dt),tType(dt),tType(dt),dtcache,tspan[2],tdir,
-                    just_hit_tstop,isout,event_last_time,vector_event_last_time,last_event_error,accept_step,
-                    last_stepfail,force_stepfail,
-                    dtchangeable,u_modified,
-                    saveiter,
-                    alg,sol,
-                    cache,callback_cache,tType(dt),W,
-                    opts,iter,success_iter,eigen_est,EEst,q,
-                    QT(qoldinit),q11)
+    # integrator =  SDEIntegrator{typeof(getalg(alg)),isinplace(prob),uType,
+    #                 uBottomEltype,tType,typeof(p),
+    #                 typeof(eigen_est),QT,
+    #                 uEltypeNoUnits,typeof(W),rateType,typeof(sol),typeof(cache),
+    #                 typeof(f),typeof(g),typeof(opts),typeof(noise),typeof(last_event_error),typeof(callback_cache)}(
+    #                 f,g,noise,uprev,tprev,t,u,p,tType(dt),tType(dt),tType(dt),dtcache,tspan[2],tdir,
+    #                 just_hit_tstop,isout,event_last_time,vector_event_last_time,last_event_error,accept_step,
+    #                 last_stepfail,force_stepfail,
+    #                 dtchangeable,u_modified,
+    #                 saveiter,
+    #                 alg,sol,
+    #                 cache,callback_cache,tType(dt),W,
+    #                 opts,iter,success_iter,eigen_est,EEst,q,
+    #                 QT(qoldinit),q11)
   
+    integrator = SDDEIntegrator{typeof(getalg(alg)),isinplace(prob), uType,
+                    uBottomEltype, tType, typeof(p),
+                    typeof(eigen_est),QT,
+                    uEltypeNoUnits,typeof(W),rateType,typeof(sol), typeof(cache),
+                    FType,GType,typeof(opts),typeof(noise),typeof(last_event_error),typeof(callback_cache), typeof(history), typeof(sde_integrator)}(
+                      f_with_history, g_with_history, noise, uprev, tprev, order_discontinuity_t0,
+                      t,u,p,tType(dt),tType(dt),tType(dt),dtcache,tspan[2],tdir,
+                      just_hit_tstop, isout, event_last_time, vector_event_last_time, last_event_error, accept_step,
+                      last_stepfail, force_stepfail, dtchangeable, u_modified, saveiter,getalg(alg), sol,
+                      cache, callback_cache, tType(dt), W,
+                      opts, iter, success_iter, eigen_est, EEst, q, QT(qoldinit), q11, history, sde_integrator)
+
     if initialize_integrator
       initialize_callbacks!(integrator, initialize_save)
       initialize!(integrator,integrator.cache)
