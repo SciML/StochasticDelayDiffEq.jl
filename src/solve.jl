@@ -1,9 +1,9 @@
 function DiffEqBase.__solve(prob::AbstractSDDEProblem, # TODO: DiffEqBase.AbstractSDDEProblem
-    alg::AbstractMethodOfStepsAlgorithm, args...;
+    alg::AbstractSDEAlgorithm, args...; # TODO: Method of steps???
     kwargs...)
-integrator = DiffEqBase.__init(prob, alg, args...; kwargs...)
-# DiffEqBase.solve!(integrator)
-# integrator.sol
+  integrator = DiffEqBase.__init(prob, alg, args...; kwargs...)
+  DiffEqBase.solve!(integrator)
+  integrator.sol
 end
 
 function DiffEqBase.__init(
@@ -416,4 +416,89 @@ function DiffEqBase.__init(
     DiffEqNoiseProcess.setup_next_step!(integrator.W)
   
     integrator
+end
+
+
+function DiffEqBase.solve!(integrator::SDDEIntegrator)
+  @inbounds while !isempty(integrator.opts.tstops)
+    while integrator.tdir*integrator.t < top(integrator.opts.tstops)
+      loopheader!(integrator)
+      if DiffEqBase.check_error!(integrator) != :Success
+        return integrator.sol
+      end
+      StochasticDiffEq.perform_step!(integrator,integrator.cache)
+      loopfooter!(integrator)
+      if isempty(integrator.opts.tstops)
+        break
+      end
+    end
+    StochasticDiffEq.handle_tstop!(integrator)
+  end
+  postamble!(integrator)
+
+  f = typeof(integrator.sol.prob.f) <: Tuple ? integrator.sol.prob.f[1] : integrator.sol.prob.f
+
+  if DiffEqBase.has_analytic(f)
+    DiffEqBase.calculate_solution_errors!(integrator.sol;timeseries_errors=integrator.opts.timeseries_errors,dense_errors=integrator.opts.dense_errors)
+  end
+  if integrator.sol.retcode != :Default
+    return integrator.sol
+  end
+  integrator.sol = DiffEqBase.solution_new_retcode(integrator.sol,:Success)
+end
+
+
+function tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan)
+  t0, tf = tspan
+  tType = eltype(tspan)
+  tdir = sign(tf - t0)
+
+  tdir_t0 = tdir * t0
+  tdir_tf = tdir * tf
+
+  # time stops
+  tstops_internal = BinaryMinHeap{tType}()
+  if isempty(d_discontinuities) && isempty(tstops) # TODO: Specialize more
+    push!(tstops_internal, tdir_tf)
+  else
+    for t in tstops
+      tdir_t = tdir * t
+      tdir_t0 < tdir_t ≤ tdir_tf && push!(tstops_internal, tdir_t)
+    end
+
+    for t in d_discontinuities
+      tdir_t = tdir * t
+      tdir_t0 < tdir_t ≤ tdir_tf && push!(tstops_internal, tdir_t)
+    end
+
+    push!(tstops_internal, tdir_tf)
+  end
+
+  # saving time points
+  saveat_internal = BinaryMinHeap{tType}()
+  if typeof(saveat) <: Number
+    if (t0:saveat:tf)[end] == tf
+      for t in (t0 + saveat):saveat:tf
+        push!(saveat_internal, tdir * t)
+      end
+    else
+      for t in (t0 + saveat):saveat:(tf - saveat)
+        push!(saveat_internal, tdir * t)
+      end
+    end
+  elseif !isempty(saveat)
+    for t in saveat
+      tdir_t = tdir * t
+      tdir_t0 < tdir_t < tdir_tf && push!(saveat_internal, tdir_t)
+    end
+  end
+
+  # discontinuities
+  d_discontinuities_internal = BinaryMinHeap{tType}()
+  sizehint!(d_discontinuities_internal.valtree, length(d_discontinuities))
+  for t in d_discontinuities
+    push!(d_discontinuities_internal, tdir * t)
+  end
+
+  tstops_internal, saveat_internal, d_discontinuities_internal
 end
