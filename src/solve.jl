@@ -27,17 +27,17 @@ function DiffEqBase.__init(
     dense = save_everystep && isempty(saveat),
     calck = (!isempty(setdiff(saveat,tstops)) || dense),
     dt = eltype(prob.tspan)(0),
-    adaptive = isadaptive(alg), # TODO: alg.alg
+    adaptive = isadaptive(getalg(alg)), # TODO: alg.alg
     gamma=9//10, # TODO gamma_default(alg.alg) ?
     abstol=nothing,
     reltol=nothing,
-    qmax=StochasticDiffEq.qmax_default(alg), # TODO: alg.alg
-    qmin=StochasticDiffEq.qmin_default(alg), # TODO: alg.alg
+    qmax=StochasticDiffEq.qmax_default(getalg(alg)), # TODO: alg.alg
+    qmin=StochasticDiffEq.qmin_default(getalg(alg)), # TODO: alg.alg
     qoldinit=1//10^4, fullnormalize=true,
     failfactor = 2,
-    beta2=StochasticDiffEq.beta2_default(alg),  # TODO: alg.alg
-    beta1=StochasticDiffEq.beta1_default(alg,beta2), # TODO: alg.alg
-    delta=StochasticDiffEq.delta_default(alg), # TODO: alg.alg
+    beta2=StochasticDiffEq.beta2_default(getalg(alg)),  # TODO: alg.alg
+    beta1=StochasticDiffEq.beta1_default(getalg(alg),beta2), # TODO: alg.alg
+    delta=StochasticDiffEq.delta_default(getalg(alg)), # TODO: alg.alg
     maxiters = adaptive ? 1000000 : typemax(Int),
     dtmax=eltype(prob.tspan)((prob.tspan[end]-prob.tspan[1])),
     dtmin = typeof(one(eltype(prob.tspan))) <: AbstractFloat ? eps(eltype(prob.tspan)) :
@@ -60,11 +60,12 @@ function DiffEqBase.__init(
     discontinuity_abstol = eltype(prob.tspan)(1//Int64(10)^12),
     discontinuity_reltol = 0, kwargs...) where recompile_flag
   
+    # alg = getalg(alg0);
     if typeof(prob.f)<:Tuple
       if any(mm != I for mm in prob.f.mass_matrix)
         error("This solver is not able to use mass matrices.")
       end
-    elseif prob.f.mass_matrix != I && !alg_mass_matrix_compatible(alg)  # TODO: alg.alg
+    elseif prob.f.mass_matrix != I && !alg_mass_matrix_compatible(getalg(alg))  # TODO: alg.alg
       error("This solver is not able to use mass matrices.")
     end
   
@@ -75,8 +76,8 @@ function DiffEqBase.__init(
     if typeof(prob.noise)<:NoiseProcess && prob.noise.bridge === nothing && adaptive
       error("Bridge function must be given for adaptivity. Either declare this function in noise process or set adaptive=false")
     end
-  
-    if !alg_compatible(prob,alg)  # TODO: alg.alg
+    
+    if !alg_compatible(prob,getalg(alg))  # TODO: alg.alg
       error("The algorithm is not compatible with the chosen noise type. Please see the documentation on the solver methods")
     end
 
@@ -115,16 +116,18 @@ function DiffEqBase.__init(
       dtmax = tdir * min(abs(dtmax), minimum(abs, constant_lags))
     end
   
-    if typeof(prob.u0) <: Tuple
-      u = ArrayPartition(prob.u0,Val{true})
-    else
-      if alias_u0
-        u = prob.u0
-      else
-        u = recursivecopy(prob.u0)
-      end
-    end
-  
+    u, uprev = u_uprev(prob.u0,alias_u0 = alias_u0)
+    # if typeof(prob.u0) <: Tuple
+    #   u = ArrayPartition(prob.u0,Val{true})
+    # else
+    #   if alias_u0
+    #     u = prob.u0
+    #   else
+    #     u = recursivecopy(prob.u0)
+    #   end
+    # end
+    # uprev = recursivecopy(u)
+
     uType = typeof(u)
     uBottomEltype = recursive_bottom_eltype(u)
     uBottomEltypeNoUnits = recursive_unitless_bottom_eltype(u)
@@ -180,7 +183,7 @@ function DiffEqBase.__init(
     end
   
     tstops_internal, saveat_internal, d_discontinuities_internal =
-      tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan)
+      tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan) # TODO add delays to discontinuities
   
     callbacks_internal = CallbackSet(callback,prob.callback)
   
@@ -190,62 +193,8 @@ function DiffEqBase.__init(
     else
       callback_cache = nothing
     end
-  
-    ### Algorithm-specific defaults ###
-    # if save_idxs === nothing
-    #   ksEltype = Vector{rateType}
-    # else
-    #   ks_prototype = rate_prototype[save_idxs]
-    #   ksEltype = Vector{typeof(ks_prototype)}
-    # end
-  
-    # Have to convert incase passed in wrong.
-    # if save_idxs === nothing
-    #   timeseries = convert(Vector{uType},timeseries_init)
-    # else
-    #   u_initial = u[save_idxs]
-    #   timeseries = convert(Vector{typeof(u_initial)},timeseries_init)
-    # end
-    # ts = convert(Vector{tType},ts_init)
-    # alg_choice = Int[]
-    ts, timeseries, saveiter = solution_arrays(u, tspan, rate_prototype,
-                    timeseries_init = timeseries_init, ts_init = ts_init, save_idxs = save_idxs, save_start = save_start)
-
-    if !adaptive && save_everystep && tspan[2]-tspan[1] != Inf
-      iszero(dt) ? steps = length(tstops) : steps = ceil(Int,internalnorm((tspan[2]-tspan[1])/dt,tspan[1]))
-      sizehint!(timeseries,steps+1)
-      sizehint!(ts,steps+1)
-    elseif save_everystep
-      sizehint!(timeseries,50)
-      sizehint!(ts,50)
-    elseif !isempty(saveat_internal)
-      sizehint!(timeseries,length(saveat_internal)+1)
-      sizehint!(ts,length(saveat_internal)+1)
-    else
-      sizehint!(timeseries,2)
-      sizehint!(ts,2)
-    end
-  
-    # if save_start
-    #   saveiter = 1 # Starts at 1 so first save is at 2
-    #   copyat_or_push!(ts,1,t)
-    #   if save_idxs === nothing
-    #     copyat_or_push!(timeseries,1,u)
-    #   else
-    #     copyat_or_push!(timeseries,1,u_initial,Val{false})
-    #   end
-    #   if typeof(alg) <: StochasticDiffEqCompositeAlgorithm  # TODO: alg.alg
-    #     copyat_or_push!(alg_choice,1,1)
-    #   end
-    # else
-    #   saveiter = 0
-    # end
-  
-
 
     QT = tTypeNoUnits <: Integer ? typeof(qmin) : tTypeNoUnits
-  
-    uprev = recursivecopy(u)
   
     if !(uType <: AbstractArray)
       rand_prototype = zero(u/u) # Strip units and type info
@@ -269,9 +218,9 @@ function DiffEqBase.__init(
     _seed = iszero(seed) ? (iszero(prob.seed) ? rand(UInt64) : prob.seed) : seed
   
     if prob.noise === nothing
-      rswm = isadaptive(alg) ? RSWM(adaptivealg=:RSwM3) : RSWM(adaptivealg=:RSwM1)  # TODO: alg.alg
+      rswm = isadaptive(getalg(alg)) ? RSWM(adaptivealg=:RSwM3) : RSWM(adaptivealg=:RSwM1)  # TODO: alg.alg
       if isinplace(prob)
-        if alg_needs_extra_process(alg)  # TODO: alg.alg
+        if alg_needs_extra_process(getalg(alg))  # TODO: alg.alg
           W = WienerProcess!(t,rand_prototype,rand_prototype,
                              save_everystep=save_noise,
                              rswm=rswm,
@@ -283,7 +232,7 @@ function DiffEqBase.__init(
                              rng = Xorshifts.Xoroshiro128Plus(_seed))
         end
       else
-        if alg_needs_extra_process(alg) # TODO: alg.alg
+        if alg_needs_extra_process(getalg(alg)) # TODO: alg.alg
           W = WienerProcess(t,rand_prototype,rand_prototype,
                              save_everystep=save_noise,
                              rswm=rswm,
@@ -309,8 +258,52 @@ function DiffEqBase.__init(
         error("Starting time in the noise process is not the starting time of the simulation. The noise process should be re-initialized for repeated use")
       end
     end
+
+    # create a history function
+    history = build_history_function(prob, alg, reltol_internal,
+                                    rate_prototype, noise_rate_prototype, W, _seed, dense;
+                                    dt = dt, adaptive = adaptive,
+                                    internalnorm = internalnorm)
+    f_with_history, g_with_history = wrap_functions_and_history(f, g, history)
+
+    ts, timeseries, saveiter = solution_arrays(u, tspan, rate_prototype,
+                    timeseries_init = timeseries_init, ts_init = ts_init, save_idxs = save_idxs, save_start = save_start)
+
+    if !adaptive && save_everystep && tspan[2]-tspan[1] != Inf
+      iszero(dt) ? steps = length(tstops) : steps = ceil(Int,internalnorm((tspan[2]-tspan[1])/dt,tspan[1]))
+      sizehint!(timeseries,steps+1)
+      sizehint!(ts,steps+1)
+    elseif save_everystep
+      sizehint!(timeseries,50)
+      sizehint!(ts,50)
+    elseif !isempty(saveat_internal)
+      sizehint!(timeseries,length(saveat_internal)+1)
+      sizehint!(ts,length(saveat_internal)+1)
+    else
+      sizehint!(timeseries,2)
+      sizehint!(ts,2)
+    end
+    
+    alg_choice = Int[]
+    if save_start && typeof(getalg(alg)) <: StochasticDiffEqCompositeAlgorithm  # TODO: alg.alg
+      copyat_or_push!(alg_choice,1,1)
+    end
+    # if save_start
+    #   saveiter = 1 # Starts at 1 so first save is at 2
+    #   copyat_or_push!(ts,1,t)
+    #   if save_idxs === nothing
+    #     copyat_or_push!(timeseries,1,u)
+    #   else
+    #     copyat_or_push!(timeseries,1,u_initial,Val{false})
+    #   end
+      # if typeof(alg) <: StochasticDiffEqCompositeAlgorithm  # TODO: alg.alg
+      #   copyat_or_push!(alg_choice,1,1)
+      # end
+    # else
+    #   saveiter = 0
+    # end
   
-    cache = StochasticDiffEq.alg_cache(alg,prob,u,W.dW,W.dZ,p,rate_prototype,noise_rate_prototype,uEltypeNoUnits,uBottomEltypeNoUnits,tTypeNoUnits,uprev,f,t,dt,Val{isinplace(prob)})
+    cache = StochasticDiffEq.alg_cache(getalg(alg),prob,u,W.dW,W.dZ,p,rate_prototype,noise_rate_prototype,uEltypeNoUnits,uBottomEltypeNoUnits,tTypeNoUnits,uprev,f,t,dt,Val{isinplace(prob)})
   
     id = StochasticDiffEq.LinearInterpolationData(timeseries,ts)
   
@@ -337,7 +330,7 @@ function DiffEqBase.__init(
   
     # if typeof(alg) <: Union{StochasticDiffEqCompositeAlgorithm,
                             # StochasticDiffEqRODECompositeAlgorithm}
-    if typeof(alg) <: StochasticDiffEqCompositeAlgorithm  # TODO: alg.alg
+    if typeof(getalg(alg)) <: StochasticDiffEqCompositeAlgorithm  # TODO: alg.alg
       # TODO sol = DiffEqBase.build_solution(prob,alg,ts,timeseries,W=W,
       sol = build_solution(prob,alg,ts,timeseries,W=W,
                                       destats = DiffEqBase.DEStats(0),

@@ -13,10 +13,10 @@ using DiffEqBase
 using DiffEqBase: @add_kwonly, add_kwonly
 import DiffEqBase:
 DEProblem, DEAlgorithm, DEIntegrator, AbstractRODEProblem,
-AbstractODESolution, AbstractRODESolution, AbstractHistoryFunction, AbstractDiffEqFunction, AbstractDiffEqLinearOperator,
+AbstractODESolution, AbstractRODESolution, AbstractHistoryFunction, AbstractDiffEqFunction, AbstractDiffEqLinearOperator, AbstractSDEIntegrator,
 isinplace, __has_analytic, has_analytic, __has_jac, __has_tgrad, __has_Wfact, __has_Wfact_t, __has_paramjac, __has_syms, __has_colorvec, RECOMPILE_BY_DEFAULT, promote_tspan, isadaptive, __solve, __init, AbstractSDEAlgorithm, AbstractRODEAlgorithm, 
     ODE_DEFAULT_NORM, ODE_DEFAULT_ISOUTOFDOMAIN, ODE_DEFAULT_PROG_MESSAGE, ODE_DEFAULT_UNSTABLE_CHECK
-import DelayDiffEq: constant_extrapolant!, constant_extrapolant, AbstractMethodOfStepsAlgorithm, iscomposite, Discontinuity
+import DelayDiffEq: constant_extrapolant!, constant_extrapolant, AbstractMethodOfStepsAlgorithm, iscomposite, Discontinuity, MethodOfSteps
 import OrdinaryDiffEq: tstop_saveat_disc_handling, alg_maximum_order, alg_extrapolates, uses_uprev
 using DiffEqNoiseProcess
 using StochasticDiffEq
@@ -36,8 +36,11 @@ include("ToDiffEqBase/diffeqfunction.jl")
 include("ToDiffEqBase/problems/sdde_problems.jl")
 include("ToDiffEqBase/problems/problem_traits.jl")
 include("ToDiffEqBase/solutions/rode_solutions.jl")
+
 include("integrators/type.jl")
 include("integrators/utils.jl")
+include("functionwrapper.jl")
+include("history_function.jl")
 include("utils.jl")
 include("solve.jl")
 # # include("algorithms.jl")

@@ -1,3 +1,17 @@
+mutable struct HistorySDEIntegrator{algType,IIP,uType,tType,SolType,CacheType} <: AbstractSDEIntegrator{algType,IIP,uType,tType}
+    sol::SolType
+    u::uType
+    t::tType
+    dt::tType
+    uprev::uType
+    tprev::tType
+    alg::algType
+    dtcache::tType
+    tdir::Int
+    saveiter::Int
+    cache::CacheType
+  end
+
 mutable struct
     SDDEIntegrator{algType,IIP,uType,uEltype,tType,P,eigenType,tTypeNoUnits,uEltypeNoUnits,randType,rateType,solType,cacheType,F4,F5,OType,noiseType,EventErrorType,CallbackCacheType,H,IType} <: AbstractSDDEIntegrator{algType,IIP,uType,tType}
     f::F4
