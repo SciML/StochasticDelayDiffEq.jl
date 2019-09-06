@@ -1,1 +1,0 @@
-# iscomposite(::StochasticDiffEq.StochasticDiffEqCompositeAlgorithm) = true
