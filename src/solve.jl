@@ -448,7 +448,7 @@ function DiffEqBase.solve!(integrator::SDDEIntegrator)
 end
 
 
-function tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan)
+function StochasticDiffEq.tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan)
   t0, tf = tspan
   tType = eltype(tspan)
   tdir = sign(tf - t0)

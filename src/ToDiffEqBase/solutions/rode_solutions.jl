@@ -1,11 +1,11 @@
 function build_solution(
-    prob::AbstractSDDEProblem,
-    # prob::AbstractSDDEProblem,
-    alg,t,u;W=nothing,timeseries_errors = length(u) > 2,
-    dense = false,dense_errors=dense,calculate_error=true,
-    interp = LinearInterpolation(t,u),
-    retcode = :Default,
-    seed = UInt64(0), destats=nothing, kwargs...)
+        prob::AbstractSDDEProblem,
+        # prob::AbstractSDDEProblem,
+        alg,t,u;W=nothing,timeseries_errors = length(u) > 2,
+        dense = false,dense_errors=dense,calculate_error=true,
+        interp = LinearInterpolation(t,u),
+        retcode = :Default,
+        seed = UInt64(0), destats=nothing, kwargs...)
 
   T = eltype(eltype(u))
   N = length((size(prob.u0)..., length(u)))

@@ -14,7 +14,7 @@ using DiffEqBase: @add_kwonly, add_kwonly
 import DiffEqBase:
 DEProblem, DEAlgorithm, DEIntegrator, AbstractRODEProblem,
 AbstractODESolution, AbstractRODESolution, AbstractHistoryFunction, AbstractDiffEqFunction, AbstractDiffEqLinearOperator, AbstractSDEIntegrator,
-isinplace, __has_analytic, has_analytic, __has_jac, __has_tgrad, __has_Wfact, __has_Wfact_t, __has_paramjac, __has_syms, __has_colorvec, RECOMPILE_BY_DEFAULT, promote_tspan, isadaptive, __solve, __init, postamble!, savevalues,
+isinplace, __has_analytic, has_analytic, __has_jac, __has_tgrad, __has_Wfact, __has_Wfact_t, __has_paramjac, __has_syms, __has_colorvec, RECOMPILE_BY_DEFAULT, promote_tspan, isadaptive, __solve, __init, postamble!, savevalues!,
     AbstractSDEAlgorithm, AbstractRODEAlgorithm, 
     ODE_DEFAULT_NORM, ODE_DEFAULT_ISOUTOFDOMAIN, ODE_DEFAULT_PROG_MESSAGE, ODE_DEFAULT_UNSTABLE_CHECK
 import DelayDiffEq: constant_extrapolant!, constant_extrapolant, AbstractMethodOfStepsAlgorithm, iscomposite, Discontinuity, MethodOfSteps
