@@ -7,7 +7,7 @@ function DiffEqBase.__solve(prob::AbstractSDDEProblem, # TODO: DiffEqBase.Abstra
 end
 
 function DiffEqBase.__init(
-    prob::AbstractSDDEProblem,# DiffEqBasee.AbstractSDDEProblem
+    prob::AbstractSDDEProblem,# TODO DiffEqBasee.AbstractSDDEProblem
     alg::Union{AbstractRODEAlgorithm,AbstractSDEAlgorithm},
     timeseries_init=typeof(prob.u0)[],
     ts_init=eltype(prob.tspan)[],
@@ -27,17 +27,17 @@ function DiffEqBase.__init(
     dense = save_everystep && isempty(saveat),
     calck = (!isempty(setdiff(saveat,tstops)) || dense),
     dt = eltype(prob.tspan)(0),
-    adaptive = isadaptive(getalg(alg)), # TODO: alg.alg
+    adaptive = StochasticDiffEq.isadaptive(getalg(alg)),
     gamma=9//10, # TODO gamma_default(alg.alg) ?
     abstol=nothing,
     reltol=nothing,
-    qmax=StochasticDiffEq.qmax_default(getalg(alg)), # TODO: alg.alg
-    qmin=StochasticDiffEq.qmin_default(getalg(alg)), # TODO: alg.alg
+    qmax=StochasticDiffEq.qmax_default(getalg(alg)),
+    qmin=StochasticDiffEq.qmin_default(getalg(alg)),
     qoldinit=1//10^4, fullnormalize=true,
     failfactor = 2,
-    beta2=StochasticDiffEq.beta2_default(getalg(alg)),  # TODO: alg.alg
-    beta1=StochasticDiffEq.beta1_default(getalg(alg),beta2), # TODO: alg.alg
-    delta=StochasticDiffEq.delta_default(getalg(alg)), # TODO: alg.alg
+    beta2=StochasticDiffEq.beta2_default(getalg(alg)), 
+    beta1=StochasticDiffEq.beta1_default(getalg(alg),beta2),
+    delta=StochasticDiffEq.delta_default(getalg(alg)),
     maxiters = adaptive ? 1000000 : typemax(Int),
     dtmax=eltype(prob.tspan)((prob.tspan[end]-prob.tspan[1])),
     dtmin = typeof(one(eltype(prob.tspan))) <: AbstractFloat ? eps(eltype(prob.tspan)) :
@@ -65,7 +65,7 @@ function DiffEqBase.__init(
       if any(mm != I for mm in prob.f.mass_matrix)
         error("This solver is not able to use mass matrices.")
       end
-    elseif prob.f.mass_matrix != I && !alg_mass_matrix_compatible(getalg(alg))  # TODO: alg.alg
+    elseif prob.f.mass_matrix != I && !alg_mass_matrix_compatible(getalg(alg))
       error("This solver is not able to use mass matrices.")
     end
   
@@ -77,7 +77,7 @@ function DiffEqBase.__init(
       error("Bridge function must be given for adaptivity. Either declare this function in noise process or set adaptive=false")
     end
     
-    if !alg_compatible(prob,getalg(alg))  # TODO: alg.alg
+    if !alg_compatible(prob,getalg(alg))
       error("The algorithm is not compatible with the chosen noise type. Please see the documentation on the solver methods")
     end
 
@@ -218,9 +218,9 @@ function DiffEqBase.__init(
     _seed = iszero(seed) ? (iszero(prob.seed) ? rand(UInt64) : prob.seed) : seed
   
     if prob.noise === nothing
-      rswm = isadaptive(getalg(alg)) ? RSWM(adaptivealg=:RSwM3) : RSWM(adaptivealg=:RSwM1)  # TODO: alg.alg
+      rswm = StochasticDiffEq.isadaptive(getalg(alg)) ? RSWM(adaptivealg=:RSwM3) : RSWM(adaptivealg=:RSwM1)  
       if isinplace(prob)
-        if alg_needs_extra_process(getalg(alg))  # TODO: alg.alg
+        if alg_needs_extra_process(getalg(alg))  
           W = WienerProcess!(t,rand_prototype,rand_prototype,
                              save_everystep=save_noise,
                              rswm=rswm,
@@ -232,7 +232,7 @@ function DiffEqBase.__init(
                              rng = Xorshifts.Xoroshiro128Plus(_seed))
         end
       else
-        if alg_needs_extra_process(getalg(alg)) # TODO: alg.alg
+        if alg_needs_extra_process(getalg(alg)) 
           W = WienerProcess(t,rand_prototype,rand_prototype,
                              save_everystep=save_noise,
                              rswm=rswm,
@@ -278,7 +278,7 @@ function DiffEqBase.__init(
     end
     
     alg_choice = Int[]
-    if save_start && typeof(getalg(alg)) <: StochasticDiffEqCompositeAlgorithm  # TODO: alg.alg
+    if save_start && typeof(getalg(alg)) <: StochasticDiffEqCompositeAlgorithm  
       copyat_or_push!(alg_choice,1,1)
     end
 
@@ -319,7 +319,7 @@ function DiffEqBase.__init(
     # if typeof(alg) <: Union{StochasticDiffEqCompositeAlgorithm,
                             # StochasticDiffEqRODECompositeAlgorithm}
 
-    if typeof(getalg(alg)) <: StochasticDiffEqCompositeAlgorithm  # TODO: alg.alg
+    if typeof(getalg(alg)) <: StochasticDiffEqCompositeAlgorithm  
       # TODO sol = DiffEqBase.build_solution(prob,alg,ts,timeseries,W=W,
       # sol = build_solution(prob,alg,ts,timeseries,W=W,
       # TODO: DISCONNECT!!!!

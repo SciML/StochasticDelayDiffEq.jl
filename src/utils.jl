@@ -107,7 +107,7 @@ depends on the parameter settings of the numerical solver.
 """
 function Base.sizehint!(sol::RODESolution, alg, tspan, tstops, saveat;
                         save_everystep = isempty(saveat),
-                        adaptive = DiffEqBase.isadaptive(getalg(alg)), # adaptive = DiffEqBase.isadaptive(getalg(alg)),
+                        adaptive = StochasticDiffEq.isadaptive(getalg(alg)), # adaptive = StochasticDiffEq.isadaptive(getalg(alg)),
                         internalnorm = DiffEqBase.ODE_DEFAULT_NORM, # internalnorm = DiffEqBase.ODE_DEFAULT_NORM,
                         dt = zero(eltype(tspan)))
   # obtain integration time
@@ -136,7 +136,7 @@ end
 
 function build_history_function(prob, alg, reltol, rate_prototype, noise_rate_prototype, W, _seed, dense;
   dt = zero(eltype(prob.tspan)),
-  adaptive = DiffEqBase.isadaptive(getalg(alg)),
+  adaptive = StochasticDiffEq.isadaptive(getalg(alg)),
   calck = false,
   internalnorm = DiffEqBase.ODE_DEFAULT_NORM)
   @unpack f, g, h, u0, tspan, p = prob
@@ -159,7 +159,7 @@ function build_history_function(prob, alg, reltol, rate_prototype, noise_rate_pr
   # of the integrator do not fail
   # sde_f = SDEFunctionWrapper(f, prob.h)
   # sde_g = SDEDiffusionTermWrapper(g,prob.h)
-  
+
   sde_f,sde_g = wrap_functions_and_history(f, g, h)
   sde_prob = SDEProblem{isinplace(prob)}(sde_f, sde_g, u0, tspan, p)
 

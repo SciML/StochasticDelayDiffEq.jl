@@ -25,7 +25,7 @@ import StochasticDiffEq: alg_order, alg_mass_matrix_compatible, alg_compatible, 
     EM, LambaEM, RSWM, StochasticDiffEqAlgorithm, AbstractSDEAlgorithm, StochasticDiffEqAdaptiveAlgorithm, StochasticDiffEqCompositeAlgorithm, StochasticDiffEqRODECompositeAlgorithm, SDEIntegrator
 
 import RandomNumbers: Xorshifts
-
+using Random
 import Base: convert
 # #########################################################
 # #########################################################
@@ -45,8 +45,6 @@ include("history_function.jl")
 include("utils.jl")
 include("solve.jl")
 # # include("algorithms.jl")
-# # include("history_function.jl")
-# # include("solve.jl")
 
 export __init, __solve, SDDEProblem
 
