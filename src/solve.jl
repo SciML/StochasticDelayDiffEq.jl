@@ -43,15 +43,15 @@ function DiffEqBase.__init(
     dtmin = typeof(one(eltype(prob.tspan))) <: AbstractFloat ? eps(eltype(prob.tspan)) :
             typeof(one(eltype(prob.tspan))) <: Integer ? 0 :
             eltype(prob.tspan)(1//10^(10)),
-    internalnorm = ODE_DEFAULT_NORM,
-    isoutofdomain = ODE_DEFAULT_ISOUTOFDOMAIN,
-    unstable_check = ODE_DEFAULT_UNSTABLE_CHECK,
+    internalnorm = DiffEqBase.ODE_DEFAULT_NORM,
+    isoutofdomain = DiffEqBase.ODE_DEFAULT_ISOUTOFDOMAIN,
+    unstable_check = DiffEqBase.ODE_DEFAULT_UNSTABLE_CHECK,
     verbose = true,force_dtmin = false,
     timeseries_errors = true, dense_errors=false,
     advance_to_tstop = false,stop_at_next_tstop=false,
     initialize_save = true,
     progress=false,progress_steps=1000,progress_name="SDDE",
-    progress_message = ODE_DEFAULT_PROG_MESSAGE,
+    progress_message = DiffEqBase.ODE_DEFAULT_PROG_MESSAGE,
     userdata=nothing,
     initialize_integrator=true,
     seed = UInt64(0), alias_u0=false,
@@ -77,7 +77,7 @@ function DiffEqBase.__init(
       error("Bridge function must be given for adaptivity. Either declare this function in noise process or set adaptive=false")
     end
     
-    if !alg_compatible(prob,getalg(alg))
+    if !StochasticDiffEq.alg_compatible(prob,getalg(alg))
       error("The algorithm is not compatible with the chosen noise type. Please see the documentation on the solver methods")
     end
 
@@ -117,16 +117,6 @@ function DiffEqBase.__init(
     end
   
     u, uprev = u_uprev(prob.u0,alias_u0 = alias_u0)
-    # if typeof(prob.u0) <: Tuple
-    #   u = ArrayPartition(prob.u0,Val{true})
-    # else
-    #   if alias_u0
-    #     u = prob.u0
-    #   else
-    #     u = recursivecopy(prob.u0)
-    #   end
-    # end
-    # uprev = recursivecopy(u)
 
     uType = typeof(u)
     uBottomEltype = recursive_bottom_eltype(u)
@@ -172,7 +162,7 @@ function DiffEqBase.__init(
     end
     rateType = typeof(rate_prototype) ## Can be different if united
   
-    if is_diagonal_noise(prob)
+    if StochasticDiffEq.is_diagonal_noise(prob)
       noise_rate_prototype = rate_prototype
     else
       if prob isa AbstractSDDEProblem # TODO DiffEqBase.AbstractSDDEProblem
@@ -201,7 +191,7 @@ function DiffEqBase.__init(
       randType = typeof(rand_prototype)
     else
       randElType = uBottomEltypeNoUnits # Strip units and type info
-      if is_diagonal_noise(prob)
+      if StochasticDiffEq.is_diagonal_noise(prob)
         if typeof(u) <: SArray
           rand_prototype = zero(u) # TODO: Array{randElType} for units
         else
@@ -220,7 +210,7 @@ function DiffEqBase.__init(
     if prob.noise === nothing
       rswm = StochasticDiffEq.isadaptive(getalg(alg)) ? RSWM(adaptivealg=:RSwM3) : RSWM(adaptivealg=:RSwM1)  
       if isinplace(prob)
-        if alg_needs_extra_process(getalg(alg))  
+        if StochasticDiffEq.alg_needs_extra_process(getalg(alg))  
           W = WienerProcess!(t,rand_prototype,rand_prototype,
                              save_everystep=save_noise,
                              rswm=rswm,
@@ -232,7 +222,7 @@ function DiffEqBase.__init(
                              rng = Xorshifts.Xoroshiro128Plus(_seed))
         end
       else
-        if alg_needs_extra_process(getalg(alg)) 
+        if StochasticDiffEq.alg_needs_extra_process(getalg(alg)) 
           W = WienerProcess(t,rand_prototype,rand_prototype,
                              save_everystep=save_noise,
                              rswm=rswm,
@@ -278,7 +268,7 @@ function DiffEqBase.__init(
     end
     
     alg_choice = Int[]
-    if save_start && typeof(getalg(alg)) <: StochasticDiffEqCompositeAlgorithm  
+    if save_start && typeof(getalg(alg)) <: StochasticDiffEq.StochasticDiffEqCompositeAlgorithm  
       copyat_or_push!(alg_choice,1,1)
     end
 
@@ -316,23 +306,17 @@ function DiffEqBase.__init(
                       verbose,calck,force_dtmin,
                       advance_to_tstop,stop_at_next_tstop)
   
-    # if typeof(alg) <: Union{StochasticDiffEqCompositeAlgorithm,
-                            # StochasticDiffEqRODECompositeAlgorithm}
 
-    if typeof(getalg(alg)) <: StochasticDiffEqCompositeAlgorithm  
-      # TODO sol = DiffEqBase.build_solution(prob,alg,ts,timeseries,W=W,
-      # sol = build_solution(prob,alg,ts,timeseries,W=W,
+    if typeof(getalg(alg)) <: StochasticDiffEq.StochasticDiffEqCompositeAlgorithm  
       # TODO: DISCONNECT!!!!
-      sol = build_solution(prob,alg,sde_integrator.sol.t,sde_integrator.sol.u,W=W,
+      sol =  DiffEqBase.build_solution(prob,alg,sde_integrator.sol.t,sde_integrator.sol.u,W=W,
                                       destats = DiffEqBase.DEStats(0),
                                       calculate_error = false, alg_choice=alg_choice,
                                       interp = id, dense = dense, seed = _seed)
     # separate statistics of the integrator and the history
     else
-    # TODO  sol = DiffEqBase.build_solution(prob,alg,ts,timeseries,W=W,
-      # sol = build_solution(prob,alg,ts,timeseries,W=W,
       # TODO: DISCONNECT!!!!
-      sol = build_solution(prob,alg,sde_integrator.sol.t,sde_integrator.sol.u,W=W,
+      sol = DiffEqBase.build_solution(prob,alg,sde_integrator.sol.t,sde_integrator.sol.u,W=W,
                                       destats = DiffEqBase.DEStats(0),
                                       calculate_error = false,
                                       interp = id, dense = dense, seed = _seed)
@@ -370,22 +354,7 @@ function DiffEqBase.__init(
     success_iter = 0
     q = tTypeNoUnits(1)
   
-    # integrator =  SDEIntegrator{typeof(getalg(alg)),isinplace(prob),uType,
-    #                 uBottomEltype,tType,typeof(p),
-    #                 typeof(eigen_est),QT,
-    #                 uEltypeNoUnits,typeof(W),rateType,typeof(sol),typeof(cache),
-    #                 typeof(f),typeof(g),typeof(opts),typeof(noise),typeof(last_event_error),typeof(callback_cache)}(
-    #                 f,g,noise,uprev,tprev,t,u,p,tType(dt),tType(dt),tType(dt),dtcache,tspan[2],tdir,
-    #                 just_hit_tstop,isout,event_last_time,vector_event_last_time,last_event_error,accept_step,
-    #                 last_stepfail,force_stepfail,
-    #                 dtchangeable,u_modified,
-    #                 saveiter,
-    #                 alg,sol,
-    #                 cache,callback_cache,tType(dt),W,
-    #                 opts,iter,success_iter,eigen_est,EEst,q,
-    #                 QT(qoldinit),q11)
-  
-    integrator = SDDEIntegrator{typeof(getalg(alg)),isinplace(prob), uType,
+      integrator = SDDEIntegrator{typeof(getalg(alg)),isinplace(prob), uType,
                     uBottomEltype, tType, typeof(p),
                     typeof(eigen_est),QT,
                     uEltypeNoUnits,typeof(W),rateType,typeof(sol), typeof(cache),
@@ -398,17 +367,16 @@ function DiffEqBase.__init(
                       opts, iter, success_iter, eigen_est, EEst, q, QT(qoldinit), q11, history, sde_integrator)
 
     if initialize_integrator
-      initialize_callbacks!(integrator, initialize_save)
+      StochasticDiffEq.initialize_callbacks!(integrator, initialize_save)
       initialize!(integrator,integrator.cache)
-    #   save_start && typeof(alg) <: Union{StochasticDiffEqCompositeAlgorithm,
-    #                                      StochasticDiffEqRODECompositeAlgorithm} && copyat_or_push!(alg_choice,1,integrator.cache.current)
-      save_start && typeof(alg) <: StochasticDiffEqCompositeAlgorithm && copyat_or_push!(alg_choice,1,integrator.cache.current)
+
+      save_start && typeof(alg) <: StochasticDiffEq.StochasticDiffEqCompositeAlgorithm && copyat_or_push!(alg_choice,1,integrator.cache.current)
     end
   
-    handle_dt!(integrator)
+    StochasticDiffEq.handle_dt!(integrator)
   
     ## Modify the first dt for tstops
-    modify_dt_for_tstops!(integrator)
+    StochasticDiffEq.modify_dt_for_tstops!(integrator)
     ### Needs to be done before first rand
     integrator.sqdt = integrator.tdir*sqrt(abs(integrator.dt))
   
@@ -448,7 +416,8 @@ function DiffEqBase.solve!(integrator::SDDEIntegrator)
 end
 
 
-function StochasticDiffEq.tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan)
+# function StochasticDiffEq.tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan)
+  function tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan)
   t0, tf = tspan
   tType = eltype(tspan)
   tdir = sign(tf - t0)

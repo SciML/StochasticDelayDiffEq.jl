@@ -23,7 +23,7 @@ p = [1.0,-4.,-2.,10.,-0.3,-0.2, 0.1]
 
 prob = SDDEProblem(hayes_modelf, hayes_modelg, h, tspan, p; constant_lags = (p[1],));
 
-solEM=StochasticDelayDiffEq.solve(prob,StochasticDelayDiffEq.EM(),dt=0.001)
-solLEM=StochasticDelayDiffEq.solve(prob,StochasticDelayDiffEq.LambaEM(),dt=0.001)
+solEM=solve(prob,EM(),dt=0.001)
+solLEM=solve(prob,LambaEM(),dt=0.001)
 
 plot(sol)

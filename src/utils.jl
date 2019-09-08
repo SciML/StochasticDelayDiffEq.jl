@@ -107,8 +107,8 @@ depends on the parameter settings of the numerical solver.
 """
 function Base.sizehint!(sol::RODESolution, alg, tspan, tstops, saveat;
                         save_everystep = isempty(saveat),
-                        adaptive = StochasticDiffEq.isadaptive(getalg(alg)), # adaptive = StochasticDiffEq.isadaptive(getalg(alg)),
-                        internalnorm = DiffEqBase.ODE_DEFAULT_NORM, # internalnorm = DiffEqBase.ODE_DEFAULT_NORM,
+                        adaptive = StochasticDiffEq.isadaptive(getalg(alg)), 
+                        internalnorm = DiffEqBase.ODE_DEFAULT_NORM, 
                         dt = zero(eltype(tspan)))
   # obtain integration time
   t0 = first(tspan)
@@ -167,7 +167,6 @@ function build_history_function(prob, alg, reltol, rate_prototype, noise_rate_pr
   sde_u, sde_uprev = u_uprev(u0; alias_u0 = false)
 
   # # initialize output arrays
-  # sde_k = typeof(rate_prototype)[]
   sde_ts, sde_timeseries, sde_saveiter = solution_arrays(sde_u, tspan, rate_prototype,
                                       save_idxs = nothing,
                                       save_start = true)
@@ -177,16 +176,14 @@ function build_history_function(prob, alg, reltol, rate_prototype, noise_rate_pr
 
   # build dense interpolation of history
   id = StochasticDiffEq.LinearInterpolationData(sde_timeseries,sde_ts)
-  if typeof(getalg(alg)) <: StochasticDiffEqCompositeAlgorithm  # TODO: alg.alg
-    # TODO sol = DiffEqBase.build_solution(prob,alg,ts,timeseries,W=W,
+  if typeof(getalg(alg)) <: StochasticDiffEq.StochasticDiffEqCompositeAlgorithm
     alg_choice = Int[]
-    sde_sol = build_solution(prob,alg,sde_ts,sde_timeseries,W=W,
+    sde_sol = DiffEqBase.build_solution(prob,alg,sde_ts,sde_timeseries,W=W,
                                     destats = DiffEqBase.DEStats(0),
                                     calculate_error = false, alg_choice=alg_choice,
                                     interp = id, dense = dense, seed = _seed)
   else
-  # TODO  sol = DiffEqBase.build_solution(prob,alg,ts,timeseries,W=W,
-    sde_sol = build_solution(prob,alg,sde_ts,sde_timeseries,W=W,
+    sde_sol = DiffEqBase.build_solution(prob,alg,sde_ts,sde_timeseries,W=W,
                                     destats = DiffEqBase.DEStats(0),
                                     calculate_error = false,
                                     interp = id, dense = dense, seed = _seed)
@@ -206,6 +203,6 @@ function build_history_function(prob, alg, reltol, rate_prototype, noise_rate_pr
   # # to a joint dense history of the DDE
   # # we use this history information to create a problem function of the DDE with all
   # # available history information that is of the form f(du,u,p,t) or f(u,p,t) such that
-  # # ODE algorithms can be applied
+  # # SDE algorithms can be applied
   HistoryFunction(prob.h, sde_integrator)
 end
