@@ -23,7 +23,7 @@ mutable struct
     # prev2_idx::Int - from DDEIntegrator TODO
     # fpsolver::FP - from DDEIntegrator TODO
     order_discontinuity_t0::Int  #- from DDEIntegrator TODO
-    # tracked_discontinuities::Vector{Discontinuity{tType}}  #- from DDEIntegrator TODO
+    tracked_discontinuities::Vector{Discontinuity{tType}}
     # discontinuity_interp_points::Int #- from DDEIntegrator TODO
     # discontinuity_abstol::dAbsType #- from DDEIntegrator TODO
     # discontinuity_reltol::dRelType #- from DDEIntegrator TODO
