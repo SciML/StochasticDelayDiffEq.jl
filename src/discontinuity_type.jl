@@ -8,6 +8,7 @@ struct Discontinuity{tType}
     t::tType
     order::Rational{Int64}
 end
+Discontinuity(t::tType,order::Integer) where tType = Discontinuity(t,Rational{Int64}(order))
 
 # ordering of discontinuities
 Base.:<(a::Discontinuity, b::Discontinuity) = a.t < b.t || (a.t == b.t && a.order < b.order)
