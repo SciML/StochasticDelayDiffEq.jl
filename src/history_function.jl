@@ -48,7 +48,7 @@ function (f::HistoryFunction)(p, t, ::Type{Val{deriv}}=Val{0}; idxs=nothing) whe
 
   if integrator.t == sol.prob.tspan[1]
     # handle extrapolations at initial time point
-    return DelayDiffEq.constant_extrapolant(t, integrator, idxs, Val{deriv})
+    return constant_extrapolant(t, integrator, idxs, Val{deriv})
     #TODO only difference form DelayDiffEq here
   else
     return StochasticDiffEq.current_interpolant(t, integrator, idxs, Val{deriv})
@@ -87,7 +87,7 @@ function (f::HistoryFunction)(val, p, t, ::Type{Val{deriv}}=Val{0}; idxs=nothing
 
   if integrator.t == sol.prob.tspan[1]
     # handle extrapolations at initial time point
-    return DelayDiffEq.constant_extrapolant!(val, t, integrator, idxs, Val{deriv})
+    return constant_extrapolant!(val, t, integrator, idxs, Val{deriv})
   else
     return StochasticDiffEq.current_interpolant!(val, t, integrator, idxs, Val{deriv})
     #TODO only difference form DelayDiffEq here
