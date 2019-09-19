@@ -185,7 +185,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
         push!(tracked_discontinuities, Discontinuity(tdir * t, order_discontinuity_t0))
     end
 
-    callbacks_internal = CallbackSet(callback, prob.callback)
+    callbacks_internal = CallbackSet(callback)
 
     max_len_cb = DiffEqBase.max_vector_callback_length(callbacks_internal)
     if max_len_cb isa DiffEqBase.VectorContinuousCallback
