@@ -15,4 +15,4 @@ Interfacing with StochasticDiffEq.jl for implicit methods for stiff equations is
 
 ## Available Solvers
 
-For the list of available solvers, please refer to the [DifferentialEquations.jl DDE Solvers page](http://docs.juliadiffeq.org/latest/solvers/dde_solve.html). For options for the `solve` command, see the [common solver options page](http://docs.juliadiffeq.org/latest/basics/common_solver_opts.html).
+For the list of available solvers, please refer to the [DifferentialEquations.jl SDE Solvers page](http://docs.juliadiffeq.org/latest/solvers/sde_solve.html). For options for the `solve` command, see the [common solver options page](http://docs.juliadiffeq.org/latest/basics/common_solver_opts.html).
