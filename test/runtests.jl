@@ -1,6 +1,5 @@
-
 using SafeTestsets
 
-@safetestset "Prob And Sol Tests" begin
+@safetestset "SDDEProblem, solve" begin
     include("test_prob_sol.jl")
 end

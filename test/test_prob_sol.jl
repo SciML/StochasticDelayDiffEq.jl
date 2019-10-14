@@ -1,4 +1,5 @@
-using StochasticDelayDiffEq, Test
+using StochasticDelayDiffEq
+using Test
 
 #Hayes Equation
 begin
@@ -98,4 +99,30 @@ padd = [1.0,-4.,-2.,10.,-0.0,-0.0, 0.1]
         sol = @test_nowarn solve(prob,TangXiaoSROCK2(version_num=i),dt=0.01)
         @test sol.u[end] != zeros(1)
     end
+
+    # Test Implicit methods
+    sol = @test_nowarn solve(prob,ImplicitEM(),dt=0.01)
+    @test sol.u[end] != zeros(1)
+    sol = @test_nowarn solve(prob,ImplicitEM(symplectic=true, theta = 1/2),dt=0.01)
+    @test sol.u[end] != zeros(1)
+    sol = @test_nowarn solve(prob,ImplicitEulerHeun(),dt=0.01)
+    @test sol.u[end] != zeros(1)
+    sol = @test_nowarn solve(prob,ImplicitEulerHeun(symplectic=true, theta = 1/2),dt=0.01)
+    @test sol.u[end] != zeros(1)
+    sol = @test_nowarn solve(prob,ImplicitRKMil(),dt=0.01)
+    @test sol.u[end] != zeros(1)
+    sol = @test_nowarn solve(prob,ImplicitRKMil(symplectic=true, theta = 1/2),dt=0.01)
+    @test sol.u[end] != zeros(1)
+    sol = @test_nowarn solve(prob,ImplicitRKMil(interpretation=:Stratonovich, symplectic = true, theta = 1/2),dt=0.01)
+    @test sol.u[end] != zeros(1)
+    sol = @test_nowarn solve(prob,ISSEM(),dt=0.01)
+    @test sol.u[end] != zeros(1)
+    sol = @test_nowarn solve(prob,ISSEM(symplectic=true, theta = 1/2),dt=0.01)
+    @test sol.u[end] != zeros(1)
+    sol = @test_nowarn solve(prob,ISSEulerHeun(),dt=0.01)
+    @test sol.u[end] != zeros(1)
+    sol = @test_nowarn solve(prob,ISSEulerHeun(symplectic=true, theta = 1/2),dt=0.01)
+    @test sol.u[end] != zeros(1)
+    sol = @test_nowarn solve(prob,SKenCarp(),dt=0.01)
+    @test sol.u[end] != zeros(1)
 end
