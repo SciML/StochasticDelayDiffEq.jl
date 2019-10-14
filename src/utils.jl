@@ -206,3 +206,51 @@ function build_history_function(prob, alg, reltol, rate_prototype, noise_rate_pr
   # # SDE algorithms can be applied
   HistoryFunction(prob.h, sde_integrator)
 end
+
+
+"""
+    initialize_solution!(integrator::SDDEIntegrator)
+
+Initialize the solution of an integrator by adjusting the cache for composite algorithms.
+"""
+function initialize_solution!(integrator::SDDEIntegrator)
+  if iscomposite(getalg(integrator.alg))
+    copyat_or_push!(integrator.integrator.sol.alg_choice, 1, integrator.cache.current)
+    if integrator.opts.save_start
+      copyat_or_push!(integrator.sol.alg_choice, 1, integrator.cache.current)
+    end
+  end
+
+  nothing
+end
+
+
+DiffEqBase.nlsolve_f(integrator::SDDEIntegrator) =
+  DiffEqBase.nlsolve_f(integrator.f, unwrap_alg(integrator, true))
+
+function unwrap_alg(integrator::SDDEIntegrator, is_stiff)
+  alg = integrator.alg
+  iscomp = typeof(alg) <: StochasticDiffEq.StochasticCompositeAlgorithm
+  if !iscomp
+    return alg
+  elseif typeof(alg.choice_function) <: DiffEqBase.AutoSwitch
+    num = is_stiff ? 2 : 1
+    return alg.algs[num]
+  else
+    return alg.algs[integrator.cache.current]
+  end
+end
+
+function DiffEqBase.unwrap_cache(integrator::SDDEIntegrator, is_stiff)
+  alg   = getalg(integrator.alg)
+  cache = integrator.cache
+  iscomp = alg isa StochasticDiffEq.StochasticCompositeAlgorithm
+  if !iscomp
+    return cache
+  elseif alg.choice_function isa DiffEqBase.AutoSwitch
+    num = is_stiff ? 2 : 1
+    return cache.caches[num]
+  else
+    return cache.caches[integrator.cache.current]
+  end
+end

@@ -291,7 +291,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
 
     sde_integrator = history.integrator;
 
-    cache = StochasticDiffEq.alg_cache(getalg(alg), prob, u, W.dW, W.dZ, p, rate_prototype, noise_rate_prototype, uEltypeNoUnits, uBottomEltypeNoUnits, tTypeNoUnits, uprev, f, t, dt, Val{isinplace(prob)})
+    cache = StochasticDiffEq.alg_cache(getalg(alg), prob, u, W.dW, W.dZ, p, rate_prototype, noise_rate_prototype, uEltypeNoUnits, uBottomEltypeNoUnits, tTypeNoUnits, uprev, f_with_history, t, dt, Val{isinplace(prob)})
 
     # id = StochasticDiffEq.LinearInterpolationData(timeseries,ts)
     id = StochasticDiffEq.LinearInterpolationData(sde_integrator.sol.u, sde_integrator.sol.t)

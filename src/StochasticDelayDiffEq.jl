@@ -6,6 +6,7 @@ module StochasticDelayDiffEq
 # using DifferentialEquations
 using Reexport
 @reexport using StochasticDiffEq
+# import StochasticDiffEq: calc_J, calc_J!, calc_tderivative!, calc_tderivative
 using LinearAlgebra, StaticArrays
 using Parameters, DataStructures
 using Logging
@@ -32,6 +33,5 @@ include("functionwrapper.jl")
 include("history_function.jl")
 include("utils.jl")
 include("solve.jl")
-# # include("algorithms.jl")
 
 end # module
