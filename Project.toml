@@ -22,7 +22,7 @@ Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [compat]
 DataStructures = "0.17"
-DiffEqBase = "6"
+DiffEqBase = "6.23"
 DiffEqNoiseProcess = "3.3.1"
 StochasticDiffEq = "6.11"
 DelayDiffEq = "5"
