@@ -8,7 +8,7 @@ using Reexport
 @reexport using StochasticDiffEq
 # import StochasticDiffEq: calc_J, calc_J!, calc_tderivative!, calc_tderivative
 using LinearAlgebra, StaticArrays
-using Parameters, DataStructures
+using UnPack, DataStructures
 using Logging
 using RecursiveArrayTools
 using DiffEqBase: AbstractSDDEProblem, AbstractSDDEAlgorithm, AbstractRODESolution, AbstractRODEFunction, AbstractSDEIntegrator, AbstractSDDEIntegrator, DEIntegrator, DEAlgorithm, AbstractRODEAlgorithm, AbstractSDEAlgorithm
