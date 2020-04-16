@@ -61,7 +61,9 @@ padd = [1.0,-4.,-2.,10.,-0.0,-0.0, 0.1]
     @test sol.u[end] != zeros(1)
     sol = @test_nowarn solve(prob,SOSRI2(),dt=0.01)
     @test sol.u[end] != zeros(1)
+
     # Additive problems
+    println("additive problems")
     prob.p .= padd;
     sol = @test_nowarn solve(prob,SRA(),dt=0.01)
     @test sol.u[end] != zeros(1)
@@ -78,6 +80,7 @@ padd = [1.0,-4.,-2.,10.,-0.0,-0.0, 0.1]
     # @test_nowarn solve(prob,SKenCarp(),dt=0.01) # Not working
 
     # Test SROCK methods
+    println("SROCK methods")
     prob.p .= pmul;
     sol = @test_nowarn solve(prob,SROCK1(),dt=0.01)
     @test sol.u[end] != zeros(1)
@@ -101,6 +104,7 @@ padd = [1.0,-4.,-2.,10.,-0.0,-0.0, 0.1]
     end
 
     # Test Implicit methods
+    println("implicit methods")
     sol = @test_nowarn solve(prob,ImplicitEM(),dt=0.01)
     @test sol.u[end] != zeros(1)
     sol = @test_nowarn solve(prob,ImplicitEM(symplectic=true, theta = 1/2),dt=0.01)
