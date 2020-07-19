@@ -17,4 +17,4 @@ Interfacing with StochasticDiffEq.jl for implicit methods for stiff equations is
 
 ## Available Solvers
 
-For the list of available solvers, please refer to the [DifferentialEquations.jl SDE Solvers page](https://docs.sciml.ai/stable/solvers/sde_solve/). For options for the `solve` command, see the [common solver options page](https://docs.sciml.ai/stable/basics/common_solver_opts/).
+For the list of available solvers, please refer to the [DifferentialEquations.jl SDE Solvers page](https://diffeq.sciml.ai/stable/solvers/sde_solve/). For options for the `solve` command, see the [common solver options page](https://diffeq.sciml.ai/stable/basics/common_solver_opts/).
