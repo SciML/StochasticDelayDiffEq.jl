@@ -299,3 +299,23 @@ end
   end
   return saved, savedexactly
 end
+
+@inline function DiffEqNoiseProcess.setup_next_step!(integrator::SDDEIntegrator)
+  !isnothing(integrator.W) && DiffEqNoiseProcess.setup_next_step!(integrator.W,integrator.u,integrator.p)
+  !isnothing(integrator.P) && DiffEqNoiseProcess.setup_next_step!(integrator.P,integrator.u,integrator.p)
+end
+
+@inline function DiffEqNoiseProcess.reject_step!(integrator::SDDEIntegrator,dtnew = integrator.dtnew)
+  !isnothing(integrator.W) && reject_step!(integrator.W,dtnew,integrator.u,integrator.p)
+  !isnothing(integrator.P) && reject_step!(integrator.P,dtnew,integrator.u,integrator.p)
+end
+
+@inline function DiffEqNoiseProcess.accept_step!(integrator::SDDEIntegrator,setup)
+  !isnothing(integrator.W) && accept_step!(integrator.W,integrator.dt,integrator.u,integrator.p,setup)
+  !isnothing(integrator.P) && accept_step!(integrator.P,integrator.dt,integrator.u,integrator.p,setup)
+end
+
+@inline function DiffEqNoiseProcess.save_noise!(integrator::SDDEIntegrator)
+  !isnothing(integrator.W) && DiffEqNoiseProcess.save_noise!(integrator.W)
+  !isnothing(integrator.P) && DiffEqNoiseProcess.save_noise!(integrator.P)
+end

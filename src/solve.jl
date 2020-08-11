@@ -76,9 +76,9 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
         error("Bridge function must be given for adaptivity. Either declare this function in noise process or set adaptive=false")
     end
 
-    if !StochasticDiffEq.alg_compatible(prob, getalg(alg))
-        error("The algorithm is not compatible with the chosen noise type. Please see the documentation on the solver methods")
-    end
+    #if !StochasticDiffEq.alg_compatible(prob, getalg(alg))
+    #    error("The algorithm is not compatible with the chosen noise type. Please see the documentation on the solver methods")
+    #end
 
     if haskey(kwargs, :initial_order)
         @warn "initial_order has been deprecated. Please specify order_discontinuity_t0 in the DDEProblem instead."
@@ -170,6 +170,41 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
             noise_rate_prototype = copy(prob.rand_prototype)
         end
     end
+
+    #= TODO: Jump handling
+    if typeof(_prob) <: JumpProblem && _prob.regular_jump !== nothing
+
+      if !isnothing(_prob.regular_jump.mark_dist) == nothing # https://github.com/JuliaDiffEq/DifferentialEquations.jl/issues/250
+        error("Mark distributions are currently not supported in SimpleTauLeaping")
+      end
+
+      jump_prototype = zeros(_prob.regular_jump.numjumps)
+      c = _prob.regular_jump.c
+
+      if isinplace(_prob.regular_jump)
+        rate_constants = zeros(_prob.regular_jump.numjumps)
+        _prob.regular_jump.rate(rate_constants,u./u,prob.p,tspan[1])
+        P = CompoundPoissonProcess!(_prob.regular_jump.rate,t,jump_prototype,
+                                    computerates = !alg_control_rate(alg) || !adaptive,
+                                    save_everystep=save_noise,
+                                    rng = Xorshifts.Xoroshiro128Plus(_seed))
+        alg_control_rate(alg) && adaptive && P.cache.rate(P.cache.currate,u,p,tspan[1])
+      else
+        rate_constants = _prob.regular_jump.rate(u./u,prob.p,tspan[1])
+        P = CompoundPoissonProcess(_prob.regular_jump.rate,t,jump_prototype,
+                                   save_everystep=save_noise,
+                                   computerates = !alg_control_rate(alg) || !adaptive,
+                                   rng = Xorshifts.Xoroshiro128Plus(_seed))
+        alg_control_rate(alg) && adaptive && (P.cache.currate = P.cache.rate(u,p,tspan[1]))
+      end
+
+    else
+    =#
+      jump_prototype = nothing
+      c = nothing
+      P = nothing
+      rate_constants = nothing
+    #end
 
     # tstops_internal, saveat_internal, d_discontinuities_internal =
     #   tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan) # TODO add delays to discontinuities
@@ -284,14 +319,14 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
 
     # create a history function
     history = build_history_function(prob, alg, reltol_internal,
-                                    rate_prototype, noise_rate_prototype, W, _seed, dense;
+                                    rate_prototype, noise_rate_prototype, jump_prototype, W, _seed, dense;
                                     dt = dt, adaptive = adaptive,
                                     internalnorm = internalnorm)
     f_with_history, g_with_history = wrap_functions_and_history(f, g, history)
 
     sde_integrator = history.integrator;
 
-    cache = StochasticDiffEq.alg_cache(getalg(alg), prob, u, W.dW, W.dZ, p, rate_prototype, noise_rate_prototype, uEltypeNoUnits, uBottomEltypeNoUnits, tTypeNoUnits, uprev, f_with_history, t, dt, Val{isinplace(prob)})
+    cache = StochasticDiffEq.alg_cache(getalg(alg), prob, u, W.dW, W.dZ, p, rate_prototype, noise_rate_prototype, jump_prototype, uEltypeNoUnits, uBottomEltypeNoUnits, tTypeNoUnits, uprev, f_with_history, t, dt, Val{isinplace(prob)})
 
     # id = StochasticDiffEq.LinearInterpolationData(timeseries,ts)
     id = StochasticDiffEq.LinearInterpolationData(sde_integrator.sol.u, sde_integrator.sol.t)
@@ -364,12 +399,19 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     success_iter = 0
     q = tTypeNoUnits(1)
 
-    integrator = SDDEIntegrator{typeof(getalg(alg)),isinplace(prob),uType,uBottomEltype,tType,typeof(p),typeof(eigen_est),QT,uEltypeNoUnits,typeof(W),rateType,typeof(sol),typeof(cache),FType,GType,typeof(opts),typeof(noise),typeof(last_event_error),typeof(callback_cache),typeof(history),typeof(sde_integrator)}(f_with_history, g_with_history, noise, uprev, tprev,
+    integrator = SDDEIntegrator{typeof(getalg(alg)),isinplace(prob),uType,
+                                uBottomEltype,tType,typeof(p),typeof(eigen_est),
+                                QT,uEltypeNoUnits,typeof(W),typeof(P),
+                                rateType,typeof(sol),typeof(cache),FType,GType,typeof(c),
+                                typeof(opts),typeof(noise),typeof(last_event_error),
+                                typeof(callback_cache),typeof(history),
+                                typeof(sde_integrator)}(f_with_history,
+                                g_with_history, c, noise, uprev, tprev,
                       order_discontinuity_t0, tracked_discontinuities,
                       t, u, p, tType(dt), tType(dt), tType(dt), dtcache, tspan[2], tdir,
                       just_hit_tstop, isout, event_last_time, vector_event_last_time, last_event_error, accept_step,
                       last_stepfail, force_stepfail, dtchangeable, u_modified, saveiter, getalg(alg), sol,
-                      cache, callback_cache, tType(dt), W,
+                      cache, callback_cache, tType(dt), W, P,
                       opts, iter, success_iter, eigen_est, EEst, q, QT(qoldinit), q11, history, sde_integrator)
 
     if initialize_integrator
@@ -387,7 +429,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     integrator.sqdt = integrator.tdir * sqrt(abs(integrator.dt))
 
     integrator.W.dt = integrator.dt
-    DiffEqNoiseProcess.setup_next_step!(integrator.W)
+    DiffEqNoiseProcess.setup_next_step!(integrator)
 
     integrator
 end

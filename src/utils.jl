@@ -107,8 +107,8 @@ depends on the parameter settings of the numerical solver.
 """
 function Base.sizehint!(sol::RODESolution, alg, tspan, tstops, saveat;
                         save_everystep = isempty(saveat),
-                        adaptive = StochasticDiffEq.isadaptive(getalg(alg)), 
-                        internalnorm = DiffEqBase.ODE_DEFAULT_NORM, 
+                        adaptive = StochasticDiffEq.isadaptive(getalg(alg)),
+                        internalnorm = DiffEqBase.ODE_DEFAULT_NORM,
                         dt = zero(eltype(tspan)))
   # obtain integration time
   t0 = first(tspan)
@@ -134,7 +134,7 @@ function Base.sizehint!(sol::RODESolution, alg, tspan, tstops, saveat;
   nothing
 end
 
-function build_history_function(prob, alg, reltol, rate_prototype, noise_rate_prototype, W, _seed, dense;
+function build_history_function(prob, alg, reltol, rate_prototype, noise_rate_prototype, jump_prototype, W, _seed, dense;
   dt = zero(eltype(prob.tspan)),
   adaptive = StochasticDiffEq.isadaptive(getalg(alg)),
   calck = false,
@@ -172,7 +172,7 @@ function build_history_function(prob, alg, reltol, rate_prototype, noise_rate_pr
                                       save_start = true)
 
   # # obtain cache (we alias uprev2 and uprev)
-  sde_cache = StochasticDiffEq.alg_cache(getalg(alg),prob, sde_u, W.dW, W.dZ, p, rate_prototype,noise_rate_prototype, uEltypeNoUnits, uBottomEltypeNoUnits, tTypeNoUnits, sde_uprev, f, t0, dt, Val{isinplace(prob)})
+  sde_cache = StochasticDiffEq.alg_cache(getalg(alg),prob, sde_u, W.dW, W.dZ, p, rate_prototype, noise_rate_prototype, jump_prototype, uEltypeNoUnits, uBottomEltypeNoUnits, tTypeNoUnits, sde_uprev, f, t0, dt, Val{isinplace(prob)})
 
   # build dense interpolation of history
   id = StochasticDiffEq.LinearInterpolationData(sde_timeseries,sde_ts)
