@@ -352,17 +352,18 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                       verbose, calck, force_dtmin,
                       advance_to_tstop, stop_at_next_tstop)
 
+    destats = DiffEqBase.DEStats(0)
     if typeof(getalg(alg)) <: StochasticDiffEq.StochasticDiffEqCompositeAlgorithm
       # TODO: DISCONNECT!!!!
         sol =  DiffEqBase.build_solution(prob, alg, sde_integrator.sol.t, sde_integrator.sol.u, W = W,
-                                      destats = DiffEqBase.DEStats(0),
+                                      destats = destats,
                                       calculate_error = false, alg_choice = alg_choice,
                                       interp = id, dense = dense, seed = _seed)
     # separate statistics of the integrator and the history
     else
       # TODO: DISCONNECT!!!!
         sol = DiffEqBase.build_solution(prob, alg, sde_integrator.sol.t, sde_integrator.sol.u, W = W,
-                                      destats = DiffEqBase.DEStats(0),
+                                      destats = destats,
                                       calculate_error = false,
                                       interp = id, dense = dense, seed = _seed)
     # separate statistics of the integrator and the history
@@ -412,7 +413,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                       just_hit_tstop, isout, event_last_time, vector_event_last_time, last_event_error, accept_step,
                       last_stepfail, force_stepfail, dtchangeable, u_modified, saveiter, getalg(alg), sol,
                       cache, callback_cache, tType(dt), W, P,
-                      opts, iter, success_iter, eigen_est, EEst, q, QT(qoldinit), q11, history, sde_integrator)
+                      opts, iter, success_iter, eigen_est, EEst, q, QT(qoldinit), q11, history, destats, sde_integrator)
 
     if initialize_integrator
         StochasticDiffEq.initialize_callbacks!(integrator, initialize_save)

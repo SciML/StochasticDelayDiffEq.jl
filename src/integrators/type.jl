@@ -64,6 +64,7 @@ mutable struct
     qold::tTypeNoUnits
     q11::tTypeNoUnits
     history::H
+    destats::DiffEqBase.DEStats
     integrator::IType # history integrator
   end
 
