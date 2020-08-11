@@ -16,7 +16,7 @@
         StochasticDiffEq.choose_algorithm!(integrator,integrator.cache)
         StochasticDiffEq.fix_dtnew_at_bounds!(integrator)
         StochasticDiffEq.modify_dtnew_for_tstops!(integrator)
-        reject_step!(integrator.W,integrator.dtnew)
+        reject_step!(integrator,integrator.dtnew)
         integrator.dt = integrator.dtnew
         integrator.sqdt = sqrt(abs(integrator.dt))
       end
