@@ -1,4 +1,4 @@
-using StochasticDelayDiffEq
+using StochasticDelayDiffEq, DiffEqDevTools
 using Test
 
 #Hayes Equation
