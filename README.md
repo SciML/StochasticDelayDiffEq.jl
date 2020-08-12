@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/SciML/StochasticDelayDiffEq.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/SciML/StochasticDelayDiffEq.jl)
 [![Coverage Status](https://coveralls.io/repos/github/SciML/StochasticDelayDiffEq.jl/badge.svg?branch=master)](https://coveralls.io/github/SciML/StochasticDelayDiffEq.jl?branch=master)
 
-StochasticDelayDiffEq.jl is a component package in the DifferentialEquatinos ecosystem.
+StochasticDelayDiffEq.jl is a component package in the DifferentialEquations ecosystem.
 It holds the stochastic delay differential equation solvers and utilities.
 It is built on top of StochasticDiffEq to extend those solvers for stochastic delay differential equations. While completely independent and usable on its own, users interested in using this functionality should check out [DifferentialEquations.jl](https://github.com/SciML/DifferentialEquations.jl) (documentation coming soon).
 
