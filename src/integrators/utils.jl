@@ -2,7 +2,7 @@
     tstops = integrator.opts.tstops
     if !isempty(tstops)
       tdir_t = integrator.tdir * integrator.t
-      tdir_ts_top = top(tstops)
+      tdir_ts_top = first(tstops)
       if tdir_t == tdir_ts_top
         pop!(tstops)
         integrator.just_hit_tstop = true
@@ -42,7 +42,7 @@ function handle_discontinuities!(integrator::SDDEIntegrator)
     d = pop!(integrator.opts.d_discontinuities)
     order = d.order
     while !isempty(integrator.opts.d_discontinuities) &&
-        top(integrator.opts.d_discontinuities) == integrator.tdir * integrator.t
+        first(integrator.opts.d_discontinuities) == integrator.tdir * integrator.t
 
         d2 = pop!(integrator.opts.d_discontinuities)
         order = min(order, d2.order)
@@ -55,7 +55,7 @@ function handle_discontinuities!(integrator::SDDEIntegrator)
         maxΔt = 10eps(integrator.t)
 
         while !isempty(integrator.opts.d_discontinuities) &&
-            abs(top(integrator.opts.d_discontinuities).t - integrator.tdir * integrator.t) < maxΔt
+            abs(first(integrator.opts.d_discontinuities).t - integrator.tdir * integrator.t) < maxΔt
 
             d2 = pop!(integrator.opts.d_discontinuities)
             order = min(order, d2.order)
@@ -63,7 +63,7 @@ function handle_discontinuities!(integrator::SDDEIntegrator)
 
         # also remove all corresponding time stops
         while !isempty(integrator.opts.tstops) &&
-            abs(top(integrator.opts.tstops) - integrator.tdir * integrator.t) < maxΔt
+            abs(first(integrator.opts.tstops) - integrator.tdir * integrator.t) < maxΔt
 
             pop!(integrator.opts.tstops)
         end

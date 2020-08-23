@@ -47,7 +47,7 @@
       integrator.last_stepfail = false
       integrator.tprev = integrator.t
       if typeof(integrator.t)<:AbstractFloat && !isempty(integrator.opts.tstops)
-        tstop = integrator.tdir * top(integrator.opts.tstops)
+        tstop = integrator.tdir * first(integrator.opts.tstops)
         @fastmath abs(ttmp - tstop) < 10eps(integrator.t) ? (integrator.t = tstop) : (integrator.t = ttmp)
       else
         integrator.t = ttmp
@@ -58,7 +58,7 @@
   else # Non adaptive
     integrator.tprev = integrator.t
     if typeof(integrator.t)<:AbstractFloat && !isempty(integrator.opts.tstops)
-      tstop = integrator.tdir * top(integrator.opts.tstops)
+      tstop = integrator.tdir * first(integrator.opts.tstops)
       # For some reason 10eps(integrator.t) is slow here
       # TODO: Allow higher precision but profile
       @fastmath abs(ttmp - tstop) < 10eps(max(integrator.t,tstop)) ? (integrator.t = tstop) : (integrator.t = ttmp)
@@ -260,7 +260,7 @@ end
   saved, savedexactly = false, false
   !integrator.opts.save_on && return saved, savedexactly
   tdir_t = integrator.tdir * integrator.t
-  while !isempty(integrator.opts.saveat) && top(integrator.opts.saveat) <= tdir_t # Perform saveat
+  while !isempty(integrator.opts.saveat) && first(integrator.opts.saveat) <= tdir_t # Perform saveat
     integrator.saveiter += 1; saved = true
     curt = integrator.tdir * pop!(integrator.opts.saveat)
     if curt!=integrator.t # If <t, interpolate

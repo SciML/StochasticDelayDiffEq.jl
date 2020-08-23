@@ -438,7 +438,7 @@ end
 
 function DiffEqBase.solve!(integrator::SDDEIntegrator)
     @inbounds while !isempty(integrator.opts.tstops)
-        while integrator.tdir * integrator.t < top(integrator.opts.tstops)
+        while integrator.tdir * integrator.t < first(integrator.opts.tstops)
             loopheader!(integrator)
             if DiffEqBase.check_error!(integrator) != :Success
                 return integrator.sol
