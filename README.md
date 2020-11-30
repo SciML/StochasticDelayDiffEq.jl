@@ -1,6 +1,6 @@
 # StochasticDelayDiffEq.jl
 
-[![Build Status](https://travis-ci.com/SciML/StochasticDelayDiffEq.jl.svg?branch=master)](https://travis-ci.com/SciML/StochasticDelayDiffEq.jl)
+[![Build Status](https://github.com/SciML/StochasticDelayDiffEq.jl/workflows/CI/badge.svg)](https://github.com/SciML/StochasticDelayDiffEq.jl/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/SciML/StochasticDelayDiffEq.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/SciML/StochasticDelayDiffEq.jl)
 [![Coverage Status](https://coveralls.io/repos/github/SciML/StochasticDelayDiffEq.jl/badge.svg?branch=master)](https://coveralls.io/github/SciML/StochasticDelayDiffEq.jl?branch=master)
 
