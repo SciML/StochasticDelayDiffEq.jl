@@ -221,8 +221,28 @@ end
 
 DiffEqBase.change_t_via_interpolation!(integrator::SDDEIntegrator,t,modify_save_endpoint::Type{Val{T}}=Val{false}) where T = StochasticDiffEq.change_t_via_interpolation!(integrator, t, modify_save_endpoint)
 
-function u_modified!(integrator::SDDEIntegrator,bool::Bool)
-  integrator.u_modified = bool
+# update integrator when u is modified by callbacks
+function StochasticDiffEq.handle_callback_modifiers!(integrator::SDDEIntegrator)
+    # copied from StochasticDiffEq
+    if integrator.P !== nothing && integrator.opts.adaptive
+        if integrator.cache isa StochasticDiffEqMutableCache
+            oldrate = integrator.P.cache.currate
+            integrator.P.cache.rate(oldrate, integrator.u, integrator.p, integrator.t)
+        else
+            integrator.P.cache.currate = integrator.P.cache.rate(
+                integrator.u, integrator.p, integrator.t
+            )
+        end
+    end
+
+    # update heap of discontinuities
+    # discontinuity is assumed to be of order 0, i.e. solution x is discontinuous
+    push!(integrator.opts.d_discontinuities, Discontinuity(integrator.tdir * integrator.t, 0))
+end
+
+function DiffEqBase.u_modified!(integrator::SDDEIntegrator, bool::Bool)
+    integrator.u_modified = bool
+    nothing
 end
 
 get_proposed_dt(integrator::SDDEIntegrator) = integrator.dtpropose
