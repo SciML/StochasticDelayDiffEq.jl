@@ -237,7 +237,7 @@ function StochasticDiffEq.handle_callback_modifiers!(integrator::SDDEIntegrator)
 
     # update heap of discontinuities
     # discontinuity is assumed to be of order 0, i.e. solution x is discontinuous
-    push!(integrator.opts.d_discontinuities, Discontinuity(integrator.tdir * integrator.t, 0))
+    push!(integrator.opts.d_discontinuities, Discontinuity(integrator.tdir * integrator.t, 0//1))
 end
 
 function DiffEqBase.u_modified!(integrator::SDDEIntegrator, bool::Bool)
