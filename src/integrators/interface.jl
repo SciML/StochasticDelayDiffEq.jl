@@ -175,7 +175,7 @@ function DiffEqBase.reinit!(integrator::SDDEIntegrator,u0 = integrator.sol.prob.
 
     if order_discontinuity_t0 ≤ maximum_order
       resize!(integrator.tracked_discontinuities, 1)
-      integrator.tracked_discontinuities[1] = Discontinuity(integrator.tdir * integrator.t, order_discontinuity_t0)
+      integrator.tracked_discontinuities[1] = Discontinuity(integrator.tdir * integrator.t, Rational{Int}(order_discontinuity_t0))
     else
       resize!(integrator.tracked_discontinuities, 0)
     end
@@ -237,7 +237,7 @@ function StochasticDiffEq.handle_callback_modifiers!(integrator::SDDEIntegrator)
 
     # update heap of discontinuities
     # discontinuity is assumed to be of order 0, i.e. solution x is discontinuous
-    push!(integrator.opts.d_discontinuities, Discontinuity(integrator.tdir * integrator.t, 0))
+    push!(integrator.opts.d_discontinuities, Discontinuity(integrator.tdir * integrator.t, 0//1))
 end
 
 function DiffEqBase.u_modified!(integrator::SDDEIntegrator, bool::Bool)

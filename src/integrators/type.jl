@@ -33,7 +33,7 @@ mutable struct SDDEIntegrator{algType,IIP,uType,uEltype,tType,P,eigenType,tTypeN
     # prev2_idx::Int - from DDEIntegrator TODO
     # fpsolver::FP - from DDEIntegrator TODO
     order_discontinuity_t0::Int  #- from DDEIntegrator TODO
-    tracked_discontinuities::Vector{Discontinuity{tType}}
+    tracked_discontinuities::Vector{Discontinuity{tType,Rational{Int}}}
     # discontinuity_interp_points::Int #- from DDEIntegrator TODO
     # discontinuity_abstol::dAbsType #- from DDEIntegrator TODO
     # discontinuity_reltol::dRelType #- from DDEIntegrator TODO
