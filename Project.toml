@@ -1,7 +1,7 @@
 name = "StochasticDelayDiffEq"
 uuid = "29a0d76e-afc8-11e9-03a4-eda52ae4b960"
 authors = ["Henrik Sykora <henrik1991@gmail.com>"]
-version = "0.2.7"
+version = "0.2.8"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
@@ -21,7 +21,7 @@ UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 
 [compat]
 DataStructures = "0.18"
-DelayDiffEq = "5.28.2"
+DelayDiffEq = "5.28.3"
 DiffEqBase = "6.29"
 DiffEqNoiseProcess = "5"
 RandomNumbers = "1"

@@ -84,13 +84,14 @@ than the order of the applied method or the problem is neutral.
 Discontinuities caused by constant delays are immediately calculated, and
 discontinuities caused by dependent delays are tracked by a callback.
 """
-function add_next_discontinuities!(integrator, order, t = integrator.t)
+function add_next_discontinuities!(integrator, _order, t = integrator.t)
     neutral = integrator.sol.prob.neutral
-    next_order = neutral ? order : order + oftype(order,1//2)
+    order = Rational{Int}(_order)
+    next_order = neutral ? order : order + 1//2
 
   # only track discontinuities up to order of the applied method
     alg_order = StochasticDiffEq.alg_order(getalg(integrator.alg))
-    next_order <= alg_order + oftype(alg_order,1//2) || return
+    next_order <= alg_order + 1//2 || return
 
   # discontinuities caused by constant lags
     if has_constant_lags(integrator)

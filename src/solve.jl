@@ -14,7 +14,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     recompile::Type{Val{recompile_flag}} = Val{true};
     saveat = eltype(prob.tspan)[],
     tstops = eltype(prob.tspan)[],
-    d_discontinuities = Discontinuity{eltype(prob.tspan)}[],
+    d_discontinuities = Discontinuity{eltype(prob.tspan),Rational{Int}}[],
     save_idxs = nothing,
     save_everystep = isempty(saveat),
     save_noise = save_everystep && (typeof(prob.f) <: Tuple ?
@@ -215,9 +215,9 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                                                 order_discontinuity_t0, maximum_order,
                                                 constant_lags, neutral)
 
-    tracked_discontinuities = Discontinuity{tType}[]
+    tracked_discontinuities = Discontinuity{tType,Rational{Int}}[]
     if order_discontinuity_t0 ≤ maximum_order
-        push!(tracked_discontinuities, Discontinuity(tdir * t, order_discontinuity_t0))
+        push!(tracked_discontinuities, Discontinuity(tdir * t, Rational{Int}(order_discontinuity_t0)))
     end
 
     callbacks_internal = CallbackSet(callback)
@@ -529,7 +529,7 @@ function tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan, or
     end
 
   # discontinuities
-    d_discontinuities_internal = BinaryMinHeap{Discontinuity{tType}}()
+    d_discontinuities_internal = BinaryMinHeap{Discontinuity{tType,Rational{Int}}}()
     if add_propagated_constant_lags
         sizehint!(d_discontinuities_internal.valtree, length(d_discontinuities) + length(constant_lags))
     else
@@ -540,14 +540,14 @@ function tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan, or
         tdir_t = tdir * d.t
 
         if tdir_t0 < tdir_t < tdir_tf && d.order ≤ alg_maximum_order + 1
-            push!(d_discontinuities_internal, Discontinuity{tType}(tdir_t, d.order))
+            push!(d_discontinuities_internal, Discontinuity{tType,Rational{Int}}(tdir_t, d.order))
         end
     end
 
     if add_propagated_constant_lags
         for lag in constant_lags
             if tdir * lag < maxlag
-                push!(d_discontinuities_internal, Discontinuity{tType}(tdir * (t0 + lag), next_order))
+                push!(d_discontinuities_internal, Discontinuity{tType,Rational{Int}}(tdir * (t0 + lag), next_order))
             end
         end
     end

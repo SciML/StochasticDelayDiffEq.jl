@@ -175,7 +175,7 @@ function DiffEqBase.reinit!(integrator::SDDEIntegrator,u0 = integrator.sol.prob.
 
     if order_discontinuity_t0 ≤ maximum_order
       resize!(integrator.tracked_discontinuities, 1)
-      integrator.tracked_discontinuities[1] = Discontinuity(integrator.tdir * integrator.t, order_discontinuity_t0)
+      integrator.tracked_discontinuities[1] = Discontinuity(integrator.tdir * integrator.t, Rational{Int}(order_discontinuity_t0))
     else
       resize!(integrator.tracked_discontinuities, 0)
     end

@@ -16,7 +16,7 @@ using DiffEqBase: AbstractSDDEProblem, AbstractSDDEAlgorithm, AbstractRODESoluti
 import DelayDiffEq: constant_extrapolant!, constant_extrapolant, AbstractMethodOfStepsAlgorithm, iscomposite, MethodOfSteps
 using DiffEqNoiseProcess
 
-using DelayDiffEq: HistoryFunction
+using DelayDiffEq: Discontinuity, HistoryFunction
 
 import RandomNumbers: Xorshifts
 using Random
@@ -27,7 +27,6 @@ import Base: convert
 # #########################################################
 # #########################################################
 
-include("discontinuity_type.jl")
 include("integrators/type.jl")
 include("integrators/interface.jl")
 include("integrators/utils.jl")
