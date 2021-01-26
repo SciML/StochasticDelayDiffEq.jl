@@ -16,6 +16,8 @@ using DiffEqBase: AbstractSDDEProblem, AbstractSDDEAlgorithm, AbstractRODESoluti
 import DelayDiffEq: constant_extrapolant!, constant_extrapolant, AbstractMethodOfStepsAlgorithm, iscomposite, MethodOfSteps
 using DiffEqNoiseProcess
 
+using DelayDiffEq: HistoryFunction
+
 import RandomNumbers: Xorshifts
 using Random
 import Base: convert
@@ -30,7 +32,6 @@ include("integrators/type.jl")
 include("integrators/interface.jl")
 include("integrators/utils.jl")
 include("functionwrapper.jl")
-include("history_function.jl")
 include("utils.jl")
 include("solve.jl")
 

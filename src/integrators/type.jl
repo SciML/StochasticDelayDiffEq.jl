@@ -10,10 +10,19 @@ mutable struct HistorySDEIntegrator{algType,IIP,uType,tType,SolType,CacheType} <
     tdir::Int
     saveiter::Int
     cache::CacheType
-  end
+end
 
-mutable struct
-    SDDEIntegrator{algType,IIP,uType,uEltype,tType,P,eigenType,tTypeNoUnits,uEltypeNoUnits,randType,randType2,rateType,solType,cacheType,F,G,F6,OType,noiseType,EventErrorType,CallbackCacheType,H,IType} <: AbstractSDDEIntegrator{algType,IIP,uType,tType}
+function (integrator::HistorySDEIntegrator)(t, deriv::Type=Val{0}; idxs=nothing)
+    StochasticDiffEq.current_interpolant(t, integrator, idxs, deriv)
+end
+
+function (integrator::HistorySDEIntegrator)(
+    val::AbstractArray, t::Union{Number,AbstractArray}, deriv::Type=Val{0}; idxs=nothing
+)
+    StochasticDiffEq.current_interpolant!(val, t, integrator, idxs, deriv)
+end
+
+mutable struct SDDEIntegrator{algType,IIP,uType,uEltype,tType,P,eigenType,tTypeNoUnits,uEltypeNoUnits,randType,randType2,rateType,solType,cacheType,F,G,F6,OType,noiseType,EventErrorType,CallbackCacheType,H,IType} <: AbstractSDDEIntegrator{algType,IIP,uType,tType}
     f::F
     g::G
     c::F6
@@ -66,12 +75,14 @@ mutable struct
     history::H
     destats::DiffEqBase.DEStats
     integrator::IType # history integrator
-  end
+end
 
-  function (integrator::SDDEIntegrator)(t, deriv::Type=Val{0}; idxs=nothing)
-      StochasticDiffEq.current_interpolant(t, integrator, idxs, deriv)
-  end
+function (integrator::SDDEIntegrator)(t, deriv::Type=Val{0}; idxs=nothing)
+    StochasticDiffEq.current_interpolant(t, integrator, idxs, deriv)
+end
 
-  function (integrator::SDDEIntegrator)(val::AbstractArray, t::Union{Number,AbstractArray},deriv::Type=Val{0}; idxs=nothing)
-      StochasticDiffEq.current_interpolant!(val, t, integrator, idxs, deriv)
-  end
+function (integrator::SDDEIntegrator)(
+    val::AbstractArray, t::Union{Number,AbstractArray}, deriv::Type=Val{0}; idxs=nothing
+)
+    StochasticDiffEq.current_interpolant!(val, t, integrator, idxs, deriv)
+end
