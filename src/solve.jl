@@ -21,7 +21,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                  DiffEqBase.has_analytic(prob.f[1]) : DiffEqBase.has_analytic(prob.f)),
     save_on = true,
     save_start = save_everystep || isempty(saveat) || typeof(saveat) <: Number ? true : prob.tspan[1] in saveat,
-    save_end = save_everystep || isempty(saveat) || typeof(saveat) <: Number ? true : prob.tspan[2] in saveat,
+    save_end = nothing,
     callback = nothing,
     dense = save_everystep && isempty(saveat),
     calck = (!isempty(setdiff(saveat, tstops)) || dense),
@@ -331,6 +331,9 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     # id = StochasticDiffEq.LinearInterpolationData(timeseries,ts)
     id = StochasticDiffEq.LinearInterpolationData(sde_integrator.sol.u, sde_integrator.sol.t)
 
+    save_end_user = save_end
+    save_end = save_end === nothing ? save_everystep || isempty(saveat) || saveat isa Number || prob.tspan[2] in saveat : save_end
+
     opts = StochasticDiffEq.SDEOptions(maxiters, save_everystep,
                       adaptive, abstol_internal,
                       reltol_internal, QT(gamma),
@@ -347,7 +350,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                       QT(beta1), QT(beta2),
                       convert.(uBottomEltypeNoUnits, delta),
                       QT(qoldinit),
-                      dense, save_on, save_start, save_end, save_noise,
+                      dense, save_on, save_start, save_end, save_end_user, save_noise,
                       callbacks_internal, isoutofdomain, unstable_check,
                       verbose, calck, force_dtmin,
                       advance_to_tstop, stop_at_next_tstop)
