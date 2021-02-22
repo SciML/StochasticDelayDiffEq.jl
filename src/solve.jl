@@ -332,7 +332,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     id = StochasticDiffEq.LinearInterpolationData(sde_integrator.sol.u, sde_integrator.sol.t)
 
     save_end_user = save_end
-    save_end = save_everystep || isempty(saveat) || typeof(saveat) <: Number ? true : prob.tspan[2] in saveat
+    save_end = save_end === nothing ? save_everystep || isempty(saveat) || saveat isa Number || prob.tspan[2] in saveat : save_end
 
     opts = StochasticDiffEq.SDEOptions(maxiters, save_everystep,
                       adaptive, abstol_internal,
