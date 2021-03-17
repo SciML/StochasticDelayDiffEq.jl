@@ -391,6 +391,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     eigen_est = one(uBottomEltypeNoUnits) / oneunit(tType) # rate/state = (state/time)/state = 1/t units
     EEst = tTypeNoUnits(1)
     just_hit_tstop = false
+    do_error_check = true
     isout = false
     accept_step = false
     force_stepfail = false
@@ -413,7 +414,8 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                                 g_with_history, c, noise, uprev, tprev,
                       order_discontinuity_t0, tracked_discontinuities,
                       t, u, p, tType(dt), tType(dt), tType(dt), dtcache, tspan[2], tdir,
-                      just_hit_tstop, isout, event_last_time, vector_event_last_time, last_event_error, accept_step,
+                      just_hit_tstop, do_error_check,
+                      isout, event_last_time, vector_event_last_time, last_event_error, accept_step,
                       last_stepfail, force_stepfail, dtchangeable, u_modified, saveiter, getalg(alg), sol,
                       cache, callback_cache, tType(dt), W, P,
                       opts, iter, success_iter, eigen_est, EEst, q, QT(qoldinit), q11, history, destats, sde_integrator)

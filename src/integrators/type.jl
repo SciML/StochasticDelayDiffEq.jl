@@ -47,6 +47,7 @@ mutable struct SDDEIntegrator{algType,IIP,uType,uEltype,tType,P,eigenType,tTypeN
     T::tType
     tdir::Int
     just_hit_tstop::Bool
+    do_error_check::Bool
     isout::Bool
     event_last_time::Int
     vector_event_last_time::Int
