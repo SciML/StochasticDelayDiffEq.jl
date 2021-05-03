@@ -11,6 +11,7 @@ It is built on top of StochasticDiffEq to extend those solvers for stochastic de
 
 ## API
 
+
 StochasticDelayDiffEq.jl is part of the JuliaDiffEq common interface, but can be used independently of DifferentialEquations.jl. The only requirement is that the user passes a StochasticDiffEq.jl algorithm to `solve`.
 
 Both constant and state-dependent lags are supported.
