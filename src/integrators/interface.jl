@@ -11,7 +11,7 @@
         if integrator.isout
           integrator.dtnew = integrator.dt*integrator.opts.qmin
         elseif !integrator.force_stepfail
-          integrator.dtnew = integrator.dt/min(inv(integrator.opts.qmin),integrator.q11/integrator.opts.gamma)
+          step_reject_controller!(integrator,getalg(integrator.alg))
         end
         StochasticDiffEq.choose_algorithm!(integrator,integrator.cache)
         StochasticDiffEq.fix_dtnew_at_bounds!(integrator)
@@ -37,13 +37,11 @@
     integrator.last_stepfail = true
     integrator.accept_step = false
   elseif integrator.opts.adaptive
-    @fastmath integrator.q11 = integrator.EEst^integrator.opts.beta1
-    @fastmath integrator.q = integrator.q11/(integrator.qold^integrator.opts.beta2)
-    @fastmath integrator.q = max(inv(integrator.opts.qmax),min(inv(integrator.opts.qmin),integrator.q/integrator.opts.gamma))
-    @fastmath integrator.dtnew = integrator.dt/integrator.q
+    stepsize_controller!(integrator,getalg(integrator.alg))
     integrator.isout = integrator.opts.isoutofdomain(integrator.u,integrator.p,ttmp)
-    integrator.accept_step = (!integrator.isout && integrator.EEst <= 1.0) || (integrator.opts.force_dtmin && integrator.dt <= integrator.opts.dtmin)
+    integrator.accept_step = (!integrator.isout && accept_step_controller(integrator, integrator.opts.controller)) || (integrator.opts.force_dtmin && integrator.dt <= integrator.opts.dtmin)
     if integrator.accept_step # Accepted
+      step_accept_controller!(integrator,getalg(integrator.alg))
       integrator.last_stepfail = false
       integrator.tprev = integrator.t
       if typeof(integrator.t)<:AbstractFloat && !isempty(integrator.opts.tstops)
