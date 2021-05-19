@@ -6,6 +6,7 @@ module StochasticDelayDiffEq
 # using DifferentialEquations
 using Reexport
 @reexport using StochasticDiffEq
+import StochasticDiffEq: stepsize_controller!, accept_step_controller, step_accept_controller!, step_reject_controller!, PIController
 # import StochasticDiffEq: calc_J, calc_J!, calc_tderivative!, calc_tderivative
 using LinearAlgebra, StaticArrays
 using UnPack, DataStructures
@@ -33,5 +34,6 @@ include("integrators/utils.jl")
 include("functionwrapper.jl")
 include("utils.jl")
 include("solve.jl")
+include("stepsize_controllers.jl")
 
 end # module
