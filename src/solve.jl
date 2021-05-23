@@ -350,7 +350,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     end
 
     if controller === nothing
-      controller = StochasticDiffEq.default_controller(getalg(alg), cache, qoldinit, beta1, beta2)
+      controller = StochasticDiffEq.default_controller(getalg(alg), cache, convert(QT,qoldinit), beta1, beta2)
     end
 
     opts = StochasticDiffEq.SDEOptions(maxiters, save_everystep,
