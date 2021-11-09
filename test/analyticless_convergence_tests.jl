@@ -19,8 +19,8 @@ end
 pmul = [1.0,-4.,-2.,10.,-1.3,-1.2, 1.1]
 padd = [1.0,-4.,-2.,10.,-0.0,-0.0, 0.1]
 
-prob = @test_nowarn SDDEProblem(hayes_modelf, hayes_modelg, [1.], h, tspan, pmul; constant_lags = (pmul[1],));
-@test_nowarn SDDEProblem(hayes_modelf, hayes_modelg, h, tspan, padd; constant_lags = (padd[1],));
+prob = SDDEProblem(hayes_modelf, hayes_modelg, [1.], h, tspan, pmul; constant_lags = (pmul[1],));
+SDDEProblem(hayes_modelf, hayes_modelg, h, tspan, padd; constant_lags = (padd[1],));
 
 dts = (1/2).^(8:-1:4)
 test_dt = 1/2^9
