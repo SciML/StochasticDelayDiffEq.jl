@@ -75,7 +75,7 @@ sim2 = analyticless_test_convergence(dts,prob,ImplicitEulerHeun(),test_dt,trajec
 @test abs(sim2.𝒪est[:final]-1.0) < 0.3
 sim2 = analyticless_test_convergence(dts,prob,ImplicitEulerHeun(symplectic=true, theta = 1/2),test_dt,trajectories=300, use_noise_grid=false)
 @test abs(sim2.𝒪est[:final]-1.0) < 0.3
-sim2 = analyticless_test_convergence(dts,prob,ISSEM(),test_dt,trajectories=500, use_noise_grid=false)
+sim2 = analyticless_test_convergence(dts,prob,ISSEM(),test_dt,trajectories=1000, use_noise_grid=false)
 @test abs(sim2.𝒪est[:final]-0.5) < 0.3
 sim2 = analyticless_test_convergence(dts,prob,ISSEM(symplectic=true, theta = 1/2),test_dt,trajectories=500, use_noise_grid=false)
 @test abs(sim2.𝒪est[:final]-0.5) < 0.3
