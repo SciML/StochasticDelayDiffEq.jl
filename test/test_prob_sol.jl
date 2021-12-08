@@ -12,7 +12,7 @@ begin
         du .= α.*u .+ β.*h(p,t-τ) .+ γ
     end
     h(p,t) = (ones(1) .+ t);
-    tspan = (0.,10.)
+    tspan = (0.,1.)
 end
 
 
