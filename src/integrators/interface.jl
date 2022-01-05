@@ -107,7 +107,11 @@ function DiffEqBase.auto_dt_reset!(integrator::SDDEIntegrator)
   end
 
   # determine initial time step
-  sde_prob = SDEProblem(f,g, prob.u0, prob.tspan, prob.p)
+  sde_prob = SDEProblem(f,g, prob.u0, prob.tspan, prob.p;
+                        noise_rate_prototype = prob.noise_rate_prototype,
+                        noise = prob.noise,
+                        seed = prob.seed,
+                        prob.kwargs...)
   integrator.dt = StochasticDiffEq.sde_determine_initdt(integrator.u, integrator.t,
       integrator.tdir, integrator.opts.dtmax, integrator.opts.abstol, integrator.opts.reltol,
       integrator.opts.internalnorm, sde_prob, StochasticDiffEq.get_current_alg_order(getalg(integrator.alg), integrator.cache), integrator)
@@ -244,7 +248,7 @@ function DiffEqBase.u_modified!(integrator::SDDEIntegrator, bool::Bool)
 end
 
 get_proposed_dt(integrator::SDDEIntegrator) = integrator.dtpropose
-set_proposed_dt!(integrator::SDDEIntegrator,dt::Number) = (integrator.dtpropose = dt)
+set_proposed_dt!(integrator::SDDEIntegrator,dt::Number) = (integrator.dtpropose = dt; integrator.dtcache = dt)
 
 function set_proposed_dt!(integrator::SDDEIntegrator,integrator2::SDDEIntegrator)
   integrator.dtpropose = integrator2.dtpropose
@@ -337,3 +341,15 @@ end
   !isnothing(integrator.W) && DiffEqNoiseProcess.save_noise!(integrator.W)
   !isnothing(integrator.P) && DiffEqNoiseProcess.save_noise!(integrator.P)
 end
+
+@inline DiffEqBase.get_tmp_cache(integrator::SDDEIntegrator) =
+  get_tmp_cache(integrator, integrator.alg, integrator.cache)
+# avoid method ambiguity
+for typ in (StochasticDiffEq.StochasticDiffEqAlgorithm,StochasticDiffEq.StochasticDiffEqNewtonAdaptiveAlgorithm)
+  @eval @inline DiffEqBase.get_tmp_cache(integrator::SDDEIntegrator, alg::$typ, cache::StochasticDiffEq.StochasticDiffEqConstantCache) = nothing
+end
+@inline DiffEqBase.get_tmp_cache(integrator::SDDEIntegrator, alg, cache) = (cache.tmp,)
+@inline DiffEqBase.get_tmp_cache(integrator::SDDEIntegrator, alg::StochasticDiffEq.StochasticDiffEqNewtonAdaptiveAlgorithm, cache) =
+    (cache.nlsolver.tmp, cache.nlsolver.ztmp)
+@inline DiffEqBase.get_tmp_cache(integrator::SDDEIntegrator, alg::StochasticDiffEq.StochasticCompositeAlgorithm, cache) =
+    get_tmp_cache(integrator, alg.algs[1], cache.caches[1])
