@@ -247,10 +247,10 @@ function DiffEqBase.u_modified!(integrator::SDDEIntegrator, bool::Bool)
     nothing
 end
 
-get_proposed_dt(integrator::SDDEIntegrator) = integrator.dtpropose
-set_proposed_dt!(integrator::SDDEIntegrator,dt::Number) = (integrator.dtpropose = dt; integrator.dtcache = dt)
+DiffEqBase.get_proposed_dt(integrator::SDDEIntegrator) = integrator.dtpropose
+DiffEqBase.set_proposed_dt!(integrator::SDDEIntegrator,dt::Number) = (integrator.dtpropose = dt; integrator.dtcache = dt)
 
-function set_proposed_dt!(integrator::SDDEIntegrator,integrator2::SDDEIntegrator)
+function DiffEqBase.set_proposed_dt!(integrator::SDDEIntegrator,integrator2::SDDEIntegrator)
   integrator.dtpropose = integrator2.dtpropose
   integrator.qold = integrator2.qold
 end
