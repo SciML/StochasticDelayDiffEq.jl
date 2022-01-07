@@ -349,9 +349,11 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
       Base.depwarn(message, :solve)
     end
 
-    if controller === nothing
-      controller = StochasticDiffEq.default_controller(getalg(alg), cache, convert(QT,qoldinit), beta1, beta2)
-    end
+  if controller === nothing
+    controller = StochasticDiffEq.default_controller(_alg, cache, convert(QT,qoldinit),
+                                    beta1 === nothing ? nothing : convert(QT,beta1),
+                                    beta2 === nothing ? nothing : convert(QT,beta2))
+  end
 
     opts = StochasticDiffEq.SDEOptions(maxiters, save_everystep,
                       adaptive, abstol_internal,
