@@ -216,7 +216,7 @@ end
   DiffEqBase.@.. out = (integrator.u - integrator.uprev) / integrator.dt
 end
 
-@inline function add_tstop!(integrator::SDDEIntegrator,t)
+@inline function DiffEqBase.add_tstop!(integrator::SDDEIntegrator,t)
   t < integrator.t && error("Tried to add a tstop that is behind the current time. This is strictly forbidden")
   push!(integrator.opts.tstops, integrator.tdir * t)
 end
