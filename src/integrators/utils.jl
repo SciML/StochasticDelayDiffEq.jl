@@ -1,22 +1,23 @@
 @inline function handle_tstop!(integrator)
     tstops = integrator.opts.tstops
     if !isempty(tstops)
-      tdir_t = integrator.tdir * integrator.t
-      tdir_ts_top = first(tstops)
-      if tdir_t == tdir_ts_top
-        pop!(tstops)
-        integrator.just_hit_tstop = true
-      elseif tdir_t > tdir_ts_top
-        if !integrator.dtchangeable
-          change_t_via_interpolation!(integrator, integrator.tdir * pop!(tstops), Val{true})
-          integrator.just_hit_tstop = true
-        else
-          error("Something went wrong. Integrator stepped past tstops but the algorithm was dtchangeable. Please report this error.")
+        tdir_t = integrator.tdir * integrator.t
+        tdir_ts_top = first(tstops)
+        if tdir_t == tdir_ts_top
+            pop!(tstops)
+            integrator.just_hit_tstop = true
+        elseif tdir_t > tdir_ts_top
+            if !integrator.dtchangeable
+                change_t_via_interpolation!(integrator, integrator.tdir * pop!(tstops),
+                                            Val{true})
+                integrator.just_hit_tstop = true
+            else
+                error("Something went wrong. Integrator stepped past tstops but the algorithm was dtchangeable. Please report this error.")
+            end
         end
-      end
-      isempty(integrator.opts.d_discontinuities) || handle_discontinuities!(integrator)
+        isempty(integrator.opts.d_discontinuities) || handle_discontinuities!(integrator)
     end
-  end
+end
 #=
 Dealing with discontinuities
 
@@ -43,7 +44,6 @@ function handle_discontinuities!(integrator::SDDEIntegrator)
     order = d.order
     while !isempty(integrator.opts.d_discontinuities) &&
         first(integrator.opts.d_discontinuities) == integrator.tdir * integrator.t
-
         d2 = pop!(integrator.opts.d_discontinuities)
         order = min(order, d2.order)
     end
@@ -55,8 +55,8 @@ function handle_discontinuities!(integrator::SDDEIntegrator)
         maxΔt = 10eps(integrator.t)
 
         while !isempty(integrator.opts.d_discontinuities) &&
-            abs(first(integrator.opts.d_discontinuities).t - integrator.tdir * integrator.t) < maxΔt
-
+            abs(first(integrator.opts.d_discontinuities).t - integrator.tdir * integrator.t) <
+            maxΔt
             d2 = pop!(integrator.opts.d_discontinuities)
             order = min(order, d2.order)
         end
@@ -64,7 +64,6 @@ function handle_discontinuities!(integrator::SDDEIntegrator)
         # also remove all corresponding time stops
         while !isempty(integrator.opts.tstops) &&
             abs(first(integrator.opts.tstops) - integrator.tdir * integrator.t) < maxΔt
-
             pop!(integrator.opts.tstops)
         end
     end
@@ -87,20 +86,20 @@ discontinuities caused by dependent delays are tracked by a callback.
 function add_next_discontinuities!(integrator, _order, t = integrator.t)
     neutral = integrator.sol.prob.neutral
     order = Rational{Int}(_order)
-    next_order = neutral ? order : order + 1//2
+    next_order = neutral ? order : order + 1 // 2
 
-  # only track discontinuities up to order of the applied method
+    # only track discontinuities up to order of the applied method
     alg_order = StochasticDiffEq.alg_order(getalg(integrator.alg))
-    next_order <= alg_order + 1//2 || return
+    next_order <= alg_order + 1 // 2 || return
 
-  # discontinuities caused by constant lags
+    # discontinuities caused by constant lags
     if has_constant_lags(integrator)
         constant_lags = integrator.sol.prob.constant_lags
         maxlag = integrator.tdir * (integrator.sol.prob.tspan[end] - t)
 
         for lag in constant_lags
             if integrator.tdir * lag < maxlag
-        # calculate discontinuity and add it to heap of discontinuities and time stops
+                # calculate discontinuity and add it to heap of discontinuities and time stops
                 d = Discontinuity(integrator.tdir * (t + lag), next_order)
                 push!(integrator.opts.d_discontinuities, d)
                 push!(integrator.opts.tstops, d.t)
@@ -108,7 +107,7 @@ function add_next_discontinuities!(integrator, _order, t = integrator.t)
         end
     end
 
-  # track propagated discontinuities with callback
+    # track propagated discontinuities with callback
     push!(integrator.tracked_discontinuities, Discontinuity(integrator.tdir * t, order))
     nothing
 end

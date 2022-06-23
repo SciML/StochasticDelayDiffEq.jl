@@ -1,4 +1,5 @@
-mutable struct HistorySDEIntegrator{algType,IIP,uType,tType,SolType,CacheType} <: AbstractSDEIntegrator{algType,IIP,uType,tType}
+mutable struct HistorySDEIntegrator{algType, IIP, uType, tType, SolType, CacheType} <:
+               AbstractSDEIntegrator{algType, IIP, uType, tType}
     sol::SolType
     u::uType
     t::tType
@@ -12,17 +13,21 @@ mutable struct HistorySDEIntegrator{algType,IIP,uType,tType,SolType,CacheType} <
     cache::CacheType
 end
 
-function (integrator::HistorySDEIntegrator)(t, deriv::Type=Val{0}; idxs=nothing)
+function (integrator::HistorySDEIntegrator)(t, deriv::Type = Val{0}; idxs = nothing)
     StochasticDiffEq.current_interpolant(t, integrator, idxs, deriv)
 end
 
-function (integrator::HistorySDEIntegrator)(
-    val::AbstractArray, t::Union{Number,AbstractArray}, deriv::Type=Val{0}; idxs=nothing
-)
+function (integrator::HistorySDEIntegrator)(val::AbstractArray,
+                                            t::Union{Number, AbstractArray},
+                                            deriv::Type = Val{0}; idxs = nothing)
     StochasticDiffEq.current_interpolant!(val, t, integrator, idxs, deriv)
 end
 
-mutable struct SDDEIntegrator{algType,IIP,uType,uEltype,tType,P,eigenType,tTypeNoUnits,uEltypeNoUnits,randType,randType2,rateType,solType,cacheType,F,G,F6,OType,noiseType,EventErrorType,CallbackCacheType,H,IType} <: AbstractSDDEIntegrator{algType,IIP,uType,tType}
+mutable struct SDDEIntegrator{algType, IIP, uType, uEltype, tType, P, eigenType,
+                              tTypeNoUnits, uEltypeNoUnits, randType, randType2, rateType,
+                              solType, cacheType, F, G, F6, OType, noiseType,
+                              EventErrorType, CallbackCacheType, H, IType} <:
+               AbstractSDDEIntegrator{algType, IIP, uType, tType}
     f::F
     g::G
     c::F6
@@ -33,7 +38,7 @@ mutable struct SDDEIntegrator{algType,IIP,uType,uEltype,tType,P,eigenType,tTypeN
     # prev2_idx::Int - from DDEIntegrator TODO
     # fpsolver::FP - from DDEIntegrator TODO
     order_discontinuity_t0::Int  #- from DDEIntegrator TODO
-    tracked_discontinuities::Vector{Discontinuity{tType,Rational{Int}}}
+    tracked_discontinuities::Vector{Discontinuity{tType, Rational{Int}}}
     # discontinuity_interp_points::Int #- from DDEIntegrator TODO
     # discontinuity_abstol::dAbsType #- from DDEIntegrator TODO
     # discontinuity_reltol::dRelType #- from DDEIntegrator TODO
@@ -78,12 +83,11 @@ mutable struct SDDEIntegrator{algType,IIP,uType,uEltype,tType,P,eigenType,tTypeN
     integrator::IType # history integrator
 end
 
-function (integrator::SDDEIntegrator)(t, deriv::Type=Val{0}; idxs=nothing)
+function (integrator::SDDEIntegrator)(t, deriv::Type = Val{0}; idxs = nothing)
     StochasticDiffEq.current_interpolant(t, integrator, idxs, deriv)
 end
 
-function (integrator::SDDEIntegrator)(
-    val::AbstractArray, t::Union{Number,AbstractArray}, deriv::Type=Val{0}; idxs=nothing
-)
+function (integrator::SDDEIntegrator)(val::AbstractArray, t::Union{Number, AbstractArray},
+                                      deriv::Type = Val{0}; idxs = nothing)
     StochasticDiffEq.current_interpolant!(val, t, integrator, idxs, deriv)
 end
