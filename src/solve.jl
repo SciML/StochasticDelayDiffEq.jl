@@ -510,7 +510,7 @@ function DiffEqBase.solve!(integrator::SDDEIntegrator)
     @inbounds while !isempty(integrator.opts.tstops)
         while integrator.tdir * integrator.t < first(integrator.opts.tstops)
             loopheader!(integrator)
-            if DiffEqBase.check_error!(integrator) != :Success
+            if DiffEqBase.check_error!(integrator) != ReturnCode.Success
                 return integrator.sol
             end
             StochasticDiffEq.perform_step!(integrator, integrator.cache)
@@ -534,7 +534,7 @@ function DiffEqBase.solve!(integrator::SDDEIntegrator)
     if integrator.sol.retcode != :Default
         return integrator.sol
     end
-    integrator.sol = DiffEqBase.solution_new_retcode(integrator.sol, :Success)
+    integrator.sol = DiffEqBase.solution_new_retcode(integrator.sol, ReturnCode.Success)
 end
 
 # function StochasticDiffEq.tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan)
