@@ -241,8 +241,8 @@ function initialize_solution!(integrator::SDDEIntegrator)
     nothing
 end
 
-function DiffEqBase.nlsolve_f(integrator::SDDEIntegrator)
-    DiffEqBase.nlsolve_f(integrator.f, unwrap_alg(integrator, true))
+function StochasticDiffEq.OrdinaryDiffEq.nlsolve_f(integrator::SDDEIntegrator)
+    StochasticDiffEq.OrdinaryDiffEq.nlsolve_f(integrator.f, unwrap_alg(integrator, true))
 end
 
 function unwrap_alg(integrator::SDDEIntegrator, is_stiff)
