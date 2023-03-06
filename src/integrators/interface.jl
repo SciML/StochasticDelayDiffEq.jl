@@ -100,7 +100,7 @@ end
 end
 
 function DiffEqBase.auto_dt_reset!(integrator::SDDEIntegrator)
-    # @unpack f,g, u, t, tdir, opts, sol, destats = integrator
+    # @unpack f,g, u, t, tdir, opts, sol, stats = integrator
     @unpack f, g, u, t, tdir, opts, sol = integrator
     @unpack prob = sol
     @unpack abstol, reltol, internalnorm = opts

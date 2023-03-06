@@ -407,12 +407,12 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                                        verbose, calck, force_dtmin,
                                        advance_to_tstop, stop_at_next_tstop)
 
-    destats = DiffEqBase.DEStats(0)
+    stats = DiffEqBase.Stats(0)
     if typeof(getalg(alg)) <: StochasticDiffEq.StochasticDiffEqCompositeAlgorithm
         # TODO: DISCONNECT!!!!
         sol = DiffEqBase.build_solution(prob, alg, sde_integrator.sol.t,
                                         sde_integrator.sol.u, W = W,
-                                        destats = destats,
+                                        stats = stats,
                                         calculate_error = false, alg_choice = alg_choice,
                                         interp = id, dense = dense, seed = _seed)
         # separate statistics of the integrator and the history
@@ -420,7 +420,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
         # TODO: DISCONNECT!!!!
         sol = DiffEqBase.build_solution(prob, alg, sde_integrator.sol.t,
                                         sde_integrator.sol.u, W = W,
-                                        destats = destats,
+                                        stats = stats,
                                         calculate_error = false,
                                         interp = id, dense = dense, seed = _seed)
         # separate statistics of the integrator and the history
@@ -483,7 +483,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                                                         P,
                                                         opts, iter, success_iter, eigen_est,
                                                         EEst, q, QT(qoldinit), q11, history,
-                                                        destats, sde_integrator)
+                                                        stats, sde_integrator)
 
     if initialize_integrator
         StochasticDiffEq.initialize_callbacks!(integrator, initialize_save)

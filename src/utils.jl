@@ -186,13 +186,13 @@ function build_history_function(prob, alg, reltol, rate_prototype, noise_rate_pr
     if typeof(getalg(alg)) <: StochasticDiffEq.StochasticDiffEqCompositeAlgorithm
         alg_choice = Int[]
         sde_sol = DiffEqBase.build_solution(prob, alg, sde_ts, sde_timeseries, W = W,
-                                            destats = DiffEqBase.DEStats(0),
+                                            stats = DiffEqBase.Stats(0),
                                             calculate_error = false,
                                             alg_choice = alg_choice,
                                             interp = id, dense = dense, seed = _seed)
     else
         sde_sol = DiffEqBase.build_solution(prob, alg, sde_ts, sde_timeseries, W = W,
-                                            destats = DiffEqBase.DEStats(0),
+                                            stats = DiffEqBase.Stats(0),
                                             calculate_error = false,
                                             interp = id, dense = dense, seed = _seed)
     end
