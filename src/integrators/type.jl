@@ -79,7 +79,7 @@ mutable struct SDDEIntegrator{algType, IIP, uType, uEltype, tType, P, eigenType,
     qold::tTypeNoUnits
     q11::tTypeNoUnits
     history::H
-    destats::DiffEqBase.DEStats
+    stats::DiffEqBase.Stats
     integrator::IType # history integrator
 end
 
