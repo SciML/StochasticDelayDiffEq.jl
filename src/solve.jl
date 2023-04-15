@@ -513,7 +513,7 @@ function DiffEqBase.solve!(integrator::SDDEIntegrator)
             if DiffEqBase.check_error!(integrator) != ReturnCode.Success
                 return integrator.sol
             end
-            if integrator.dt > minimum(integrator.sol.prob.constant_lags) &&
+            if !isempty(integrator.sol.prob.constant_lags) && integrator.dt > minimum(integrator.sol.prob.constant_lags) &&
                !(integrator.alg <: StochasticDiffEq.EM)
                 error("dt > minimum(constant_lags). This is not allowed by the integrator. Please dt `dtmax` less than the minimum lag or use `EM`.")
             end
