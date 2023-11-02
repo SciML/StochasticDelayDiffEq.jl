@@ -48,7 +48,7 @@ end
             step_accept_controller!(integrator, getalg(integrator.alg))
             integrator.last_stepfail = false
             integrator.tprev = integrator.t
-            if typeof(integrator.t) <: AbstractFloat && !isempty(integrator.opts.tstops)
+            if integrator.t isa AbstractFloat && !isempty(integrator.opts.tstops)
                 tstop = integrator.tdir * first(integrator.opts.tstops)
                 @fastmath abs(ttmp - tstop) < 10eps(integrator.t) ? (integrator.t = tstop) :
                           (integrator.t = ttmp)
@@ -60,7 +60,7 @@ end
         end
     else # Non adaptive
         integrator.tprev = integrator.t
-        if typeof(integrator.t) <: AbstractFloat && !isempty(integrator.opts.tstops)
+        if integrator.t isa AbstractFloat && !isempty(integrator.opts.tstops)
             tstop = integrator.tdir * first(integrator.opts.tstops)
             # For some reason 10eps(integrator.t) is slow here
             # TODO: Allow higher precision but profile
@@ -328,7 +328,7 @@ end
             save_val = val
             copyat_or_push!(integrator.sol.t, integrator.saveiter, curt)
             copyat_or_push!(integrator.sol.u, integrator.saveiter, save_val, Val{false})
-            if typeof(integrator.alg) <: StochasticDiffEq.StochasticDiffEqCompositeAlgorithm
+            if integrator.alg isa StochasticDiffEq.StochasticDiffEqCompositeAlgorithm
                 copyat_or_push!(integrator.sol.alg_choice, integrator.saveiter,
                                 integrator.cache.current)
             end
@@ -341,7 +341,7 @@ end
                 copyat_or_push!(integrator.sol.u, integrator.saveiter,
                                 integrator.u[integrator.opts.save_idxs], Val{false})
             end
-            if typeof(integrator.alg) <:
+            if integrator.alg isa
                Union{StochasticDiffEq.StochasticDiffEqCompositeAlgorithm,
                      StochasticDiffEq.StochasticDiffEqRODECompositeAlgorithm}
                 copyat_or_push!(integrator.sol.alg_choice, integrator.saveiter,
@@ -359,7 +359,7 @@ end
                             integrator.u[integrator.opts.save_idxs], Val{false})
         end
         copyat_or_push!(integrator.sol.t, integrator.saveiter, integrator.t)
-        if typeof(integrator.alg) <:
+        if integrator.alg isa
            Union{StochasticDiffEq.StochasticDiffEqCompositeAlgorithm,
                  StochasticDiffEq.StochasticDiffEqRODECompositeAlgorithm}
             copyat_or_push!(integrator.sol.alg_choice, integrator.saveiter,
