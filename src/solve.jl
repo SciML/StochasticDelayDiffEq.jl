@@ -58,6 +58,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                            advance_to_tstop = false, stop_at_next_tstop = false,
                            initialize_save = true,
                            progress = false, progress_steps = 1000, progress_name = "SDDE",
+                           progress_id=gensym("StochasticDiffEq"),
                            progress_message = DiffEqBase.ODE_DEFAULT_PROG_MESSAGE,
                            userdata = nothing,
                            initialize_integrator = true,
@@ -98,7 +99,8 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     if haskey(kwargs, :minimal_solution)
         @warn "minimal_solution is ignored"
     end
-    progress && @logmsg(-1, progress_name, _id=_id = :StochasticDiffEq, progress=0)
+
+    progress && @logmsg(LogLevel(-1),progress_name,_id=progress_id,progress=0)
 
     tType = eltype(prob.tspan)
     noise = prob.noise
@@ -398,7 +400,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                                        tstops, saveat, d_discontinuities,
                                        userdata,
                                        progress, progress_steps,
-                                       progress_name, progress_message,
+                                       progress_name, progress_message,progress_id,
                                        timeseries_errors, dense_errors,
                                        convert.(uBottomEltypeNoUnits, delta),
                                        dense, save_on, save_start, save_end, save_end_user,
