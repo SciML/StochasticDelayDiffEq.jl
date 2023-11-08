@@ -18,12 +18,12 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                                                              Rational{Int}}[],
                            save_idxs = nothing,
                            save_everystep = isempty(saveat),
-                           save_noise = save_everystep && (typeof(prob.f) <: Tuple ?
+                           save_noise = save_everystep && (prob.f isa Tuple ?
                             DiffEqBase.has_analytic(prob.f[1]) :
                             DiffEqBase.has_analytic(prob.f)),
                            save_on = true,
                            save_start = save_everystep || isempty(saveat) ||
-                                            typeof(saveat) <: Number ? true :
+                                            saveat isa Number ? true :
                                         prob.tspan[1] in saveat,
                            save_end = nothing,
                            callback = nothing,
@@ -68,7 +68,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                            discontinuity_reltol = 0, kwargs...) where {recompile_flag}
 
     # alg = getalg(alg0);
-    if typeof(prob.f) <: Tuple
+    if prob.f isa Tuple
         if any(mm != I for mm in prob.f.mass_matrix)
             error("This solver is not able to use mass matrices.")
         end
@@ -80,7 +80,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
         @warn("Dense output is incompatible with saveat. Please use the SavingCallback from the Callback Library to mix the two behaviors.")
     end
 
-    if typeof(prob.noise) <: NoiseProcess && prob.noise.bridge === nothing && adaptive
+    if prob.noise isa NoiseProcess && prob.noise.bridge === nothing && adaptive
         error("Bridge function must be given for adaptivity. Either declare this function in noise process or set adaptive=false")
     end
 
@@ -156,9 +156,9 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
         reltol_internal = real.(reltol)
     end
 
-    if isinplace(prob) && typeof(u) <: AbstractArray && eltype(u) <: Number &&
+    if isinplace(prob) && u isa AbstractArray && eltype(u) <: Number &&
        uBottomEltypeNoUnits == uBottomEltype # Could this be more efficient for other arrays?
-        if !(typeof(u) <: ArrayPartition)
+        if !(u isa ArrayPartition)
             rate_prototype = recursivecopy(u)
         else
             rate_prototype = similar(u,
@@ -185,7 +185,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     end
 
     #= TODO: Jump handling
-    if typeof(_prob) <: JumpProblem && _prob.regular_jump !== nothing
+    if _prob isa JumpProblem && _prob.regular_jump !== nothing
 
       if !isnothing(_prob.regular_jump.mark_dist) == nothing # https://github.com/JuliaDiffEq/DifferentialEquations.jl/issues/250
         error("Mark distributions are currently not supported in SimpleTauLeaping")
@@ -256,7 +256,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     else
         randElType = uBottomEltypeNoUnits # Strip units and type info
         if StochasticDiffEq.is_diagonal_noise(prob)
-            if typeof(u) <: SArray
+            if u isa SArray
                 rand_prototype = zero(u) # TODO: Array{randElType} for units
             else
                 rand_prototype = (u .- u) ./ sqrt(oneunit(t))
@@ -306,7 +306,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                 reinit!(W, t)
             end
             # Reseed
-            if typeof(W) <: NoiseProcess && W.reseed
+            if W isa NoiseProcess && W.reseed
                 Random.seed!(W.rng, _seed)
             end
         elseif W.t[end] != t
@@ -489,7 +489,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
         StochasticDiffEq.initialize_callbacks!(integrator, initialize_save)
         initialize!(integrator, integrator.cache)
 
-        save_start && typeof(alg) <: StochasticDiffEq.StochasticDiffEqCompositeAlgorithm &&
+        save_start && alg isa StochasticDiffEq.StochasticDiffEqCompositeAlgorithm &&
             copyat_or_push!(alg_choice, 1, integrator.cache.current)
     end
 
@@ -527,7 +527,7 @@ function DiffEqBase.solve!(integrator::SDDEIntegrator)
     end
     postamble!(integrator)
 
-    f = typeof(integrator.sol.prob.f) <: Tuple ? integrator.sol.prob.f[1] :
+    f = integrator.sol.prob.f isa Tuple ? integrator.sol.prob.f[1] :
         integrator.sol.prob.f
 
     if DiffEqBase.has_analytic(f)
@@ -589,7 +589,7 @@ function tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan,
 
     # saving time points
     saveat_internal = BinaryMinHeap{tType}()
-    if typeof(saveat) <: Number
+    if saveat isa Number
         if (t0:saveat:tf)[end] == tf
             for t in (t0 + saveat):saveat:tf
                 push!(saveat_internal, tdir * t)
