@@ -9,7 +9,7 @@ end
 (g::SDEDiffusionTermWrapper{false})(u, p, t) = g.g(u, g.h, p, t)
 
 struct SDEFunctionWrapper{iip, F, G, H, TMM, Ta, Tt, TJ, JVP, VJP, JP, SP, TW, TWt, TPJ, GG,
-                          S, TCV} <: DiffEqBase.AbstractRODEFunction{iip}
+                          TCV} <: DiffEqBase.AbstractRODEFunction{iip}
     f::F
     g::G
     h::H
@@ -25,7 +25,6 @@ struct SDEFunctionWrapper{iip, F, G, H, TMM, Ta, Tt, TJ, JVP, VJP, JP, SP, TW, T
     Wfact_t::TWt
     paramjac::TPJ
     ggprime::GG
-    syms::S
     colorvec::TCV
 end
 
@@ -54,7 +53,7 @@ function wrap_functions_and_history(f::SDDEFunction, g, h)
                        typeof(f.analytic), typeof(f.tgrad), typeof(jac), typeof(f.jvp),
                        typeof(f.vjp), typeof(f.jac_prototype), typeof(f.sparsity),
                        typeof(f.Wfact), typeof(f.Wfact_t), typeof(f.paramjac),
-                       typeof(f.ggprime), typeof(f.syms), typeof(f.colorvec)}(f.f, gwh, h,
+                       typeof(f.ggprime), typeof(f.colorvec)}(f.f, gwh, h,
                                                                               f.mass_matrix,
                                                                               f.analytic,
                                                                               f.tgrad, jac,
@@ -65,7 +64,6 @@ function wrap_functions_and_history(f::SDDEFunction, g, h)
                                                                               f.Wfact_t,
                                                                               f.paramjac,
                                                                               f.ggprime,
-                                                                              f.syms,
                                                                               f.colorvec),
     gwh
 end
