@@ -40,7 +40,7 @@ sim2 = analyticless_test_convergence(dts, prob, LambaEulerHeun(), test_dt,
 sim2 = analyticless_test_convergence(dts, prob, RKMil(), test_dt, trajectories = 300,
                                      use_noise_grid = false)
 @test abs(sim2.𝒪est[:final] - 1.0) < 0.3
-sim2 = analyticless_test_convergence(dts, prob, RKMil(interpretation = :Stratonovich),
+sim2 = analyticless_test_convergence(dts, prob, RKMil(interpretation = SciMLBase.AlgorithmInterpretation.Stratonovich),
                                      test_dt, trajectories = 300, use_noise_grid = false)
 @test abs(sim2.𝒪est[:final] - 1.0) < 0.3
 sim2 = analyticless_test_convergence(dts, prob, WangLi3SMil_A(), test_dt,
@@ -68,7 +68,7 @@ prob.p .= pmul;
 sim2 = analyticless_test_convergence(dts, prob, SROCK1(), test_dt, trajectories = 100,
                                      use_noise_grid = false)
 @test abs(sim2.𝒪est[:final] - 1.0) < 0.3
-sim2 = analyticless_test_convergence(dts, prob, SROCK1(interpretation = :Stratonovich),
+sim2 = analyticless_test_convergence(dts, prob, SROCK1(interpretation = SciMLBase.AlgorithmInterpretation.Stratonovich),
                                      test_dt, trajectories = 300, use_noise_grid = false)
 @test abs(sim2.𝒪est[:final] - 1.0) < 0.3
 sim2 = analyticless_test_convergence(dts, prob, SROCKEM(), test_dt, trajectories = 300,
@@ -114,7 +114,7 @@ sim2 = analyticless_test_convergence(dts, prob,
                                      test_dt, trajectories = 300, use_noise_grid = false)
 @test abs(sim2.𝒪est[:final] - 1.0) < 0.3
 sim2 = analyticless_test_convergence(dts, prob,
-                                     ImplicitRKMil(interpretation = :Stratonovich,
+                                     ImplicitRKMil(interpretation = SciMLBase.AlgorithmInterpretation.Stratonovich,
                                                    symplectic = true, theta = 1 / 2),
                                      test_dt, trajectories = 300, use_noise_grid = false)
 @test abs(sim2.𝒪est[:final] - 1.0) < 0.3
