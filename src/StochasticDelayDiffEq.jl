@@ -13,6 +13,7 @@ using LinearAlgebra, StaticArrays
 using UnPack, DataStructures
 using Logging
 using RecursiveArrayTools
+import FastPower
 using DiffEqBase: AbstractSDDEProblem, AbstractSDDEAlgorithm, AbstractRODESolution,
                   AbstractRODEFunction, AbstractSDEIntegrator, AbstractSDDEIntegrator,
                   DEIntegrator, DEAlgorithm, AbstractRODEAlgorithm, AbstractSDEAlgorithm
