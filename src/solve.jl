@@ -316,6 +316,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
         end
     end
 
+    save_idxs, saved_subsystem = SciMLBase.get_save_idxs_and_saved_subsystem(prob, save_idxs)
     ts, timeseries, saveiter = solution_arrays(u, tspan, rate_prototype,
                                                timeseries_init = timeseries_init,
                                                ts_init = ts_init, save_idxs = save_idxs,
@@ -414,7 +415,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
         # TODO: DISCONNECT!!!!
         sol = DiffEqBase.build_solution(prob, alg, sde_integrator.sol.t,
                                         sde_integrator.sol.u, W = W,
-                                        stats = stats,
+                                        stats = stats, saved_subsystem = saved_subsystem,
                                         calculate_error = false, alg_choice = alg_choice,
                                         interp = id, dense = dense, seed = _seed)
         # separate statistics of the integrator and the history
@@ -422,7 +423,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
         # TODO: DISCONNECT!!!!
         sol = DiffEqBase.build_solution(prob, alg, sde_integrator.sol.t,
                                         sde_integrator.sol.u, W = W,
-                                        stats = stats,
+                                        stats = stats, saved_subsystem = saved_subsystem,
                                         calculate_error = false,
                                         interp = id, dense = dense, seed = _seed)
         # separate statistics of the integrator and the history
