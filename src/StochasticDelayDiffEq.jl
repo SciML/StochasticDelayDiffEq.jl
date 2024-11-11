@@ -14,6 +14,7 @@ using UnPack, DataStructures
 using Logging
 using RecursiveArrayTools
 import FastPower
+import SciMLBase
 using DiffEqBase: AbstractSDDEProblem, AbstractSDDEAlgorithm, AbstractRODESolution,
                   AbstractRODEFunction, AbstractSDEIntegrator, AbstractSDDEIntegrator,
                   DEIntegrator, DEAlgorithm, AbstractRODEAlgorithm, AbstractSDEAlgorithm
