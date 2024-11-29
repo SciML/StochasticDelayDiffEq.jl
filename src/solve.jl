@@ -66,7 +66,8 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                            #  Keywords for Delay problems (from DDE)
                            discontinuity_interp_points::Int = 10,
                            discontinuity_abstol = eltype(prob.tspan)(1 // Int64(10)^12),
-                           discontinuity_reltol = 0, kwargs...) where {recompile_flag}
+                           discontinuity_reltol = 0,
+                           initializealg = StochasticDiffEq.SDEDefaultInit(), kwargs...) where {recompile_flag}
 
     # alg = getalg(alg0);
     if prob.f isa Tuple
@@ -468,7 +469,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                                 typeof(c),
                                 typeof(opts), typeof(noise), typeof(last_event_error),
                                 typeof(callback_cache), typeof(history),
-                                typeof(sde_integrator)}(f_with_history,
+                                typeof(sde_integrator), typeof(initializealg)}(f_with_history,
                                                         g_with_history, c, noise, uprev,
                                                         tprev,
                                                         order_discontinuity_t0,
@@ -486,9 +487,10 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                                                         P,
                                                         opts, iter, success_iter, eigen_est,
                                                         EEst, q, QT(qoldinit), q11, history,
-                                                        stats, sde_integrator)
+                                                        stats, sde_integrator, initializealg)
 
     if initialize_integrator
+        DiffEqBase.initialize_dae!(integrator)
         StochasticDiffEq.initialize_callbacks!(integrator, initialize_save)
         initialize!(integrator, integrator.cache)
 
