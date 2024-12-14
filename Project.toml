@@ -36,7 +36,7 @@ Reexport = "1.0"
 SciMLBase = "2.59.2"
 SparseArrays = "1.9"
 StaticArrays = "1.0"
-StochasticDiffEq = "6.19"
+StochasticDiffEq = "6.72.1"
 UnPack = "0.1, 1.0"
 julia = "1.9"
 
