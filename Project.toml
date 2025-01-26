@@ -1,7 +1,7 @@
 name = "StochasticDelayDiffEq"
 uuid = "29a0d76e-afc8-11e9-03a4-eda52ae4b960"
 authors = ["Henrik Sykora <henrik1991@gmail.com>"]
-version = "1.8.1"
+version = "1.8.2"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
@@ -36,7 +36,7 @@ Reexport = "1.0"
 SciMLBase = "2.59.2"
 SparseArrays = "1.9"
 StaticArrays = "1.0"
-StochasticDiffEq = "6.72.1"
+StochasticDiffEq = "6.73.0"
 UnPack = "0.1, 1.0"
 julia = "1.9"
 
