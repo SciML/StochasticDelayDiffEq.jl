@@ -67,7 +67,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                            discontinuity_interp_points::Int = 10,
                            discontinuity_abstol = eltype(prob.tspan)(1 // Int64(10)^12),
                            discontinuity_reltol = 0,
-                           initializealg = StochasticDiffEq.SDEDefaultInit(), kwargs...) where {recompile_flag}
+                           initializealg = StochasticDiffEq.OrdinaryDiffEqCore.DefaultInit(), kwargs...) where {recompile_flag}
 
     # alg = getalg(alg0);
     if prob.f isa Tuple
