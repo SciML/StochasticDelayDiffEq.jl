@@ -34,7 +34,7 @@ end
 (f::SDEFunctionWrapper{false})(u, p, t) = f.f(u, f.h, p, t)
 
 function wrap_functions_and_history(f::SDDEFunction, g, h)
-    gwh = SDEDiffusionTermWrapper{isinplace(g, 5), typeof(g), typeof(h)}(g, h)
+    gwh = SDEDiffusionTermWrapper{isinplace(f), typeof(g), typeof(h)}(g, h)
 
     if f.jac === nothing
         jac = nothing
