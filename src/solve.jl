@@ -46,10 +46,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
                            delta = StochasticDiffEq.delta_default(getalg(alg)),
                            maxiters = adaptive ? 1000000 : typemax(Int),
                            dtmax = eltype(prob.tspan)((prob.tspan[end] - prob.tspan[1])),
-                           dtmin = typeof(one(eltype(prob.tspan))) <: AbstractFloat ?
-                                   eps(eltype(prob.tspan)) :
-                                   typeof(one(eltype(prob.tspan))) <: Integer ? 0 :
-                                   eltype(prob.tspan)(1 // 10^(10)),
+                           dtmin = DiffEqBase.prob2dtmin(prob),
                            internalnorm = DiffEqBase.ODE_DEFAULT_NORM,
                            isoutofdomain = DiffEqBase.ODE_DEFAULT_ISOUTOFDOMAIN,
                            unstable_check = DiffEqBase.ODE_DEFAULT_UNSTABLE_CHECK,
