@@ -22,7 +22,7 @@ vectorized = "vectorized"
 
 # Common variable patterns in Julia/SciML
 ists = "ists"
-ispcs = "ispcs"
+ispcs = "ispcs" 
 osys = "osys"
 rsys = "rsys"
 usys = "usys"
@@ -71,3 +71,9 @@ MTK = "MTK"
 ODE = "ODE"
 PDE = "PDE"
 SDE = "SDE"
+
+# StochasticDelayDiffEq specific terms
+extrapolant = "extrapolant"  # Mathematical term (extrapolant function)
+padd = "padd"  # Parameter additive (variable name)
+currate = "currate"  # Current rate (variable name)
+typ = "typ"  # Abbreviated type (variable name)

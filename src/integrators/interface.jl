@@ -135,7 +135,7 @@ function DiffEqBase.auto_dt_reset!(integrator::SDDEIntegrator)
     nothing
 end
 
-DiffEqBase.has_reinit(integrator::SDDEIntegrator) = false # TODO true - syncronize with DDE!
+DiffEqBase.has_reinit(integrator::SDDEIntegrator) = false # TODO true - synchronize with DDE!
 function DiffEqBase.reinit!(integrator::SDDEIntegrator, u0 = integrator.sol.prob.u0;
                             t0 = integrator.sol.prob.tspan[1],
                             tf = integrator.sol.prob.tspan[2],
