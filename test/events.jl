@@ -9,7 +9,7 @@ using Test
 
     # event at `t = 3`
     cb = DiscreteCallback((u, t, integrator) -> t == 3,
-                          integrator -> (integrator.u = -integrator.u))
+        integrator -> (integrator.u = -integrator.u))
 
     sol = solve(prob, RKMil(), tstops = (3,), callback = cb)
     ts = findall(x -> x == 3, sol.t)

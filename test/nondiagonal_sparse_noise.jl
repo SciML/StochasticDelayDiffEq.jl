@@ -63,5 +63,5 @@ p = [0.05, 10.0, 4.0]; # β,c,τ
 Random.seed!(1234);
 
 prob_sdde = SDDEProblem(sir_dde!, sir_delayed_noise!, u0, sir_history, tspan, p;
-                        noise_rate_prototype = A);
+    noise_rate_prototype = A);
 sol_sdde = solve(prob_sdde, LambaEM(), callback = cb);

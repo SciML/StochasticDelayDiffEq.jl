@@ -9,7 +9,7 @@
         elseif tdir_t > tdir_ts_top
             if !integrator.dtchangeable
                 change_t_via_interpolation!(integrator, integrator.tdir * pop!(tstops),
-                                            Val{true})
+                    Val{true})
                 integrator.just_hit_tstop = true
             else
                 error("Something went wrong. Integrator stepped past tstops but the algorithm was dtchangeable. Please report this error.")
@@ -55,7 +55,8 @@ function handle_discontinuities!(integrator::SDDEIntegrator)
         maxΔt = 10eps(integrator.t)
 
         while !isempty(integrator.opts.d_discontinuities) &&
-            abs(first(integrator.opts.d_discontinuities).t - integrator.tdir * integrator.t) <
+            abs(first(integrator.opts.d_discontinuities).t -
+                integrator.tdir * integrator.t) <
             maxΔt
             d2 = pop!(integrator.opts.d_discontinuities)
             order = min(order, d2.order)

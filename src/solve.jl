@@ -1,73 +1,73 @@
 function DiffEqBase.__solve(prob::AbstractSDDEProblem, # TODO: DiffEqBase.AbstractSDDEProblem
-                            alg::AbstractSDEAlgorithm, args...; # TODO: Method of steps???
-                            kwargs...)
+        alg::AbstractSDEAlgorithm, args...; # TODO: Method of steps???
+        kwargs...)
     integrator = DiffEqBase.__init(prob, alg, args...; kwargs...)
     DiffEqBase.solve!(integrator)
     integrator.sol
 end
 
 function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.AbstractSDDEProblem
-                           alg::Union{AbstractRODEAlgorithm, AbstractSDEAlgorithm},
-                           timeseries_init = typeof(prob.u0)[],
-                           ts_init = eltype(prob.tspan)[],
-                           ks_init = nothing,
-                           recompile::Type{Val{recompile_flag}} = Val{true};
-                           saveat = eltype(prob.tspan)[],
-                           tstops = eltype(prob.tspan)[],
-                           d_discontinuities = Discontinuity{eltype(prob.tspan),
-                                                             Rational{Int}}[],
-                           save_idxs = nothing,
-                           save_everystep = isempty(saveat),
-                           save_noise = save_everystep && (prob.f isa Tuple ?
-                            DiffEqBase.has_analytic(prob.f[1]) :
-                            DiffEqBase.has_analytic(prob.f)),
-                           save_on = true,
-                           save_start = save_everystep || isempty(saveat) ||
-                                            saveat isa Number ? true :
-                                        prob.tspan[1] in saveat,
-                           save_end = nothing,
-                           callback = nothing,
-                           dense = save_everystep && isempty(saveat),
-                           calck = (!isempty(setdiff(saveat, tstops)) || dense),
-                           dt = eltype(prob.tspan)(0),
-                           adaptive = StochasticDiffEq.isadaptive(getalg(alg)),
-                           gamma = 9 // 10, # TODO gamma_default(alg.alg) ?
-                           abstol = nothing,
-                           reltol = nothing,
-                           qmax = StochasticDiffEq.qmax_default(getalg(alg)),
-                           qmin = StochasticDiffEq.qmin_default(getalg(alg)),
-                           qsteady_min = StochasticDiffEq.qsteady_min_default(alg),
-                           qsteady_max = StochasticDiffEq.qsteady_max_default(alg),
-                           qoldinit = 1 // 10^4, fullnormalize = true,
-                           controller = nothing,
-                           failfactor = 2,
-                           beta2 = nothing,
-                           beta1 = nothing,
-                           delta = StochasticDiffEq.delta_default(getalg(alg)),
-                           maxiters = adaptive ? 1000000 : typemax(Int),
-                           dtmax = eltype(prob.tspan)((prob.tspan[end] - prob.tspan[1])),
-                           dtmin = typeof(one(eltype(prob.tspan))) <: AbstractFloat ?
-                                   eps(eltype(prob.tspan)) :
-                                   typeof(one(eltype(prob.tspan))) <: Integer ? 0 :
-                                   eltype(prob.tspan)(1 // 10^(10)),
-                           internalnorm = DiffEqBase.ODE_DEFAULT_NORM,
-                           isoutofdomain = DiffEqBase.ODE_DEFAULT_ISOUTOFDOMAIN,
-                           unstable_check = DiffEqBase.ODE_DEFAULT_UNSTABLE_CHECK,
-                           verbose = true, force_dtmin = false,
-                           timeseries_errors = true, dense_errors = false,
-                           advance_to_tstop = false, stop_at_next_tstop = false,
-                           initialize_save = true,
-                           progress = false, progress_steps = 1000, progress_name = "SDDE",
-                           progress_id=gensym("StochasticDiffEq"),
-                           progress_message = DiffEqBase.ODE_DEFAULT_PROG_MESSAGE,
-                           userdata = nothing,
-                           initialize_integrator = true,
-                           seed = UInt64(0), alias_u0 = false,
-                           #  Keywords for Delay problems (from DDE)
-                           discontinuity_interp_points::Int = 10,
-                           discontinuity_abstol = eltype(prob.tspan)(1 // Int64(10)^12),
-                           discontinuity_reltol = 0,
-                           initializealg = StochasticDiffEq.OrdinaryDiffEqCore.DefaultInit(), kwargs...) where {recompile_flag}
+        alg::Union{AbstractRODEAlgorithm, AbstractSDEAlgorithm},
+        timeseries_init = typeof(prob.u0)[],
+        ts_init = eltype(prob.tspan)[],
+        ks_init = nothing,
+        recompile::Type{Val{recompile_flag}} = Val{true};
+        saveat = eltype(prob.tspan)[],
+        tstops = eltype(prob.tspan)[],
+        d_discontinuities = Discontinuity{eltype(prob.tspan),
+            Rational{Int}}[],
+        save_idxs = nothing,
+        save_everystep = isempty(saveat),
+        save_noise = save_everystep && (prob.f isa Tuple ?
+                      DiffEqBase.has_analytic(prob.f[1]) :
+                      DiffEqBase.has_analytic(prob.f)),
+        save_on = true,
+        save_start = save_everystep || isempty(saveat) ||
+                     saveat isa Number ? true :
+                     prob.tspan[1] in saveat,
+        save_end = nothing,
+        callback = nothing,
+        dense = save_everystep && isempty(saveat),
+        calck = (!isempty(setdiff(saveat, tstops)) || dense),
+        dt = eltype(prob.tspan)(0),
+        adaptive = StochasticDiffEq.isadaptive(getalg(alg)),
+        gamma = 9 // 10, # TODO gamma_default(alg.alg) ?
+        abstol = nothing,
+        reltol = nothing,
+        qmax = StochasticDiffEq.qmax_default(getalg(alg)),
+        qmin = StochasticDiffEq.qmin_default(getalg(alg)),
+        qsteady_min = StochasticDiffEq.qsteady_min_default(alg),
+        qsteady_max = StochasticDiffEq.qsteady_max_default(alg),
+        qoldinit = 1 // 10^4, fullnormalize = true,
+        controller = nothing,
+        failfactor = 2,
+        beta2 = nothing,
+        beta1 = nothing,
+        delta = StochasticDiffEq.delta_default(getalg(alg)),
+        maxiters = adaptive ? 1000000 : typemax(Int),
+        dtmax = eltype(prob.tspan)((prob.tspan[end] - prob.tspan[1])),
+        dtmin = typeof(one(eltype(prob.tspan))) <: AbstractFloat ?
+                eps(eltype(prob.tspan)) :
+                typeof(one(eltype(prob.tspan))) <: Integer ? 0 :
+                eltype(prob.tspan)(1 // 10^(10)),
+        internalnorm = DiffEqBase.ODE_DEFAULT_NORM,
+        isoutofdomain = DiffEqBase.ODE_DEFAULT_ISOUTOFDOMAIN,
+        unstable_check = DiffEqBase.ODE_DEFAULT_UNSTABLE_CHECK,
+        verbose = true, force_dtmin = false,
+        timeseries_errors = true, dense_errors = false,
+        advance_to_tstop = false, stop_at_next_tstop = false,
+        initialize_save = true,
+        progress = false, progress_steps = 1000, progress_name = "SDDE",
+        progress_id = gensym("StochasticDiffEq"),
+        progress_message = DiffEqBase.ODE_DEFAULT_PROG_MESSAGE,
+        userdata = nothing,
+        initialize_integrator = true,
+        seed = UInt64(0), alias_u0 = false,
+        #  Keywords for Delay problems (from DDE)
+        discontinuity_interp_points::Int = 10,
+        discontinuity_abstol = eltype(prob.tspan)(1 // Int64(10)^12),
+        discontinuity_reltol = 0,
+        initializealg = StochasticDiffEq.OrdinaryDiffEqCore.DefaultInit(), kwargs...) where {recompile_flag}
 
     # alg = getalg(alg0);
     if prob.f isa Tuple
@@ -101,7 +101,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
         @warn "minimal_solution is ignored"
     end
 
-    progress && @logmsg(LogLevel(-1),progress_name,_id=progress_id,progress=0)
+    progress && @logmsg(LogLevel(-1), progress_name, _id=progress_id, progress=0)
 
     tType = eltype(prob.tspan)
     noise = prob.noise
@@ -140,7 +140,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     if abstol === nothing
         if uBottomEltypeNoUnits == uBottomEltype
             abstol_internal = real(convert(uBottomEltype,
-                                           oneunit(uBottomEltype) * 1 // 10^2))
+                oneunit(uBottomEltype) * 1 // 10^2))
         else
             abstol_internal = real.(oneunit.(u) .* 1 // 10^2)
         end
@@ -151,7 +151,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     if reltol === nothing
         if uBottomEltypeNoUnits == uBottomEltype
             reltol_internal = real(convert(uBottomEltype,
-                                           oneunit(uBottomEltype) * 1 // 10^2))
+                oneunit(uBottomEltype) * 1 // 10^2))
         else
             reltol_internal = real.(oneunit.(u) .* 1 // 10^2)
         end
@@ -165,8 +165,8 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
             rate_prototype = recursivecopy(u)
         else
             rate_prototype = similar(u,
-                                     typeof.(oneunit.(recursive_bottom_eltype.(u.x)) ./
-                                             oneunit(tType))...)
+                typeof.(oneunit.(recursive_bottom_eltype.(u.x)) ./
+                        oneunit(tType))...)
         end
     else
         if uBottomEltypeNoUnits == uBottomEltype
@@ -226,19 +226,20 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     #   tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan) # TODO add delays to discontinuities
     # retrieve time stops, time points at which solutions is saved, and discontinuities
     maximum_order = StochasticDiffEq.alg_order(getalg(alg))
-    tstops_internal, saveat_internal, d_discontinuities_internal = tstop_saveat_disc_handling(tstops,
-                                                                                              saveat,
-                                                                                              d_discontinuities,
-                                                                                              tspan,
-                                                                                              order_discontinuity_t0,
-                                                                                              maximum_order,
-                                                                                              constant_lags,
-                                                                                              neutral)
+    tstops_internal, saveat_internal,
+    d_discontinuities_internal = tstop_saveat_disc_handling(tstops,
+        saveat,
+        d_discontinuities,
+        tspan,
+        order_discontinuity_t0,
+        maximum_order,
+        constant_lags,
+        neutral)
 
     tracked_discontinuities = Discontinuity{tType, Rational{Int}}[]
     if order_discontinuity_t0 ≤ maximum_order
         push!(tracked_discontinuities,
-              Discontinuity(tdir * t, Rational{Int}(order_discontinuity_t0)))
+            Discontinuity(tdir * t, Rational{Int}(order_discontinuity_t0)))
     end
 
     callbacks_internal = CallbackSet(callback)
@@ -246,7 +247,7 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     max_len_cb = DiffEqBase.max_vector_callback_length(callbacks_internal)
     if max_len_cb isa DiffEqBase.VectorContinuousCallback
         callback_cache = DiffEqBase.CallbackCache(max_len_cb.len, uBottomEltype,
-                                                  uBottomEltype)
+            uBottomEltype)
     else
         callback_cache = nothing
     end
@@ -280,26 +281,26 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
         if isinplace(prob)
             if StochasticDiffEq.alg_needs_extra_process(getalg(alg))
                 W = WienerProcess!(t, rand_prototype, rand_prototype,
-                                   save_everystep = save_noise,
-                                   rswm = rswm,
-                                   rng = Xorshifts.Xoroshiro128Plus(_seed))
+                    save_everystep = save_noise,
+                    rswm = rswm,
+                    rng = Xorshifts.Xoroshiro128Plus(_seed))
             else
                 W = WienerProcess!(t, rand_prototype,
-                                   save_everystep = save_noise,
-                                   rswm = rswm,
-                                   rng = Xorshifts.Xoroshiro128Plus(_seed))
+                    save_everystep = save_noise,
+                    rswm = rswm,
+                    rng = Xorshifts.Xoroshiro128Plus(_seed))
             end
         else
             if StochasticDiffEq.alg_needs_extra_process(getalg(alg))
                 W = WienerProcess(t, rand_prototype, rand_prototype,
-                                  save_everystep = save_noise,
-                                  rswm = rswm,
-                                  rng = Xorshifts.Xoroshiro128Plus(_seed))
+                    save_everystep = save_noise,
+                    rswm = rswm,
+                    rng = Xorshifts.Xoroshiro128Plus(_seed))
             else
                 W = WienerProcess(t, rand_prototype,
-                                  save_everystep = save_noise,
-                                  rswm = rswm,
-                                  rng = Xorshifts.Xoroshiro128Plus(_seed))
+                    save_everystep = save_noise,
+                    rswm = rswm,
+                    rng = Xorshifts.Xoroshiro128Plus(_seed))
             end
         end
     else
@@ -317,11 +318,13 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
         end
     end
 
-    save_idxs, saved_subsystem = SciMLBase.get_save_idxs_and_saved_subsystem(prob, save_idxs)
-    ts, timeseries, saveiter = solution_arrays(u, tspan, rate_prototype,
-                                               timeseries_init = timeseries_init,
-                                               ts_init = ts_init, save_idxs = save_idxs,
-                                               save_start = save_start)
+    save_idxs,
+    saved_subsystem = SciMLBase.get_save_idxs_and_saved_subsystem(prob, save_idxs)
+    ts, timeseries,
+    saveiter = solution_arrays(u, tspan, rate_prototype,
+        timeseries_init = timeseries_init,
+        ts_init = ts_init, save_idxs = save_idxs,
+        save_start = save_start)
 
     if !adaptive && save_everystep && tspan[2] - tspan[1] != Inf
         iszero(dt) ? steps = length(tstops) :
@@ -347,22 +350,22 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
 
     # create a history function
     history = build_history_function(prob, alg, reltol_internal,
-                                     rate_prototype, noise_rate_prototype, jump_prototype,
-                                     W, _seed, dense;
-                                     dt = dt, adaptive = adaptive,
-                                     internalnorm = internalnorm)
+        rate_prototype, noise_rate_prototype, jump_prototype,
+        W, _seed, dense;
+        dt = dt, adaptive = adaptive,
+        internalnorm = internalnorm)
     f_with_history, g_with_history = wrap_functions_and_history(f, g, history)
 
     sde_integrator = history.integrator
 
     cache = StochasticDiffEq.alg_cache(getalg(alg), prob, u, W.dW, W.dZ, p, rate_prototype,
-                                       noise_rate_prototype, jump_prototype, uEltypeNoUnits,
-                                       uBottomEltypeNoUnits, tTypeNoUnits, uprev,
-                                       f_with_history, t, dt, Val{isinplace(prob)})
+        noise_rate_prototype, jump_prototype, uEltypeNoUnits,
+        uBottomEltypeNoUnits, tTypeNoUnits, uprev,
+        f_with_history, t, dt, Val{isinplace(prob)})
 
     # id = StochasticDiffEq.LinearInterpolationData(timeseries,ts)
     id = StochasticDiffEq.LinearInterpolationData(sde_integrator.sol.u,
-                                                  sde_integrator.sol.t)
+        sde_integrator.sol.t)
 
     save_end_user = save_end
     save_end = save_end === nothing ?
@@ -382,51 +385,51 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
 
     if controller === nothing
         controller = StochasticDiffEq.default_controller(getalg(alg), cache,
-                                                         convert(QT, qoldinit), beta1,
-                                                         beta2)
+            convert(QT, qoldinit), beta1,
+            beta2)
     end
 
     opts = StochasticDiffEq.SDEOptions(maxiters, save_everystep,
-                                       adaptive, abstol_internal,
-                                       reltol_internal,
-                                       QT(gamma),
-                                       QT(qmax), QT(qmin),
-                                       QT(qsteady_max), QT(qsteady_min),
-                                       QT(qoldinit),
-                                       QT(failfactor),
-                                       tType(dtmax), tType(dtmin),
-                                       controller,
-                                       internalnorm, save_idxs,
-                                       tstops_internal, saveat_internal,
-                                       d_discontinuities_internal,
-                                       tstops, saveat, d_discontinuities,
-                                       userdata,
-                                       progress, progress_steps,
-                                       progress_name, progress_message,progress_id,
-                                       timeseries_errors, dense_errors,
-                                       convert.(uBottomEltypeNoUnits, delta),
-                                       dense, save_on, save_start, save_end, save_end_user,
-                                       save_noise,
-                                       callbacks_internal, isoutofdomain, unstable_check,
-                                       verbose, calck, force_dtmin,
-                                       advance_to_tstop, stop_at_next_tstop)
+        adaptive, abstol_internal,
+        reltol_internal,
+        QT(gamma),
+        QT(qmax), QT(qmin),
+        QT(qsteady_max), QT(qsteady_min),
+        QT(qoldinit),
+        QT(failfactor),
+        tType(dtmax), tType(dtmin),
+        controller,
+        internalnorm, save_idxs,
+        tstops_internal, saveat_internal,
+        d_discontinuities_internal,
+        tstops, saveat, d_discontinuities,
+        userdata,
+        progress, progress_steps,
+        progress_name, progress_message, progress_id,
+        timeseries_errors, dense_errors,
+        convert.(uBottomEltypeNoUnits, delta),
+        dense, save_on, save_start, save_end, save_end_user,
+        save_noise,
+        callbacks_internal, isoutofdomain, unstable_check,
+        verbose, calck, force_dtmin,
+        advance_to_tstop, stop_at_next_tstop)
 
     stats = DiffEqBase.Stats(0)
     if typeof(getalg(alg)) <: StochasticDiffEq.StochasticDiffEqCompositeAlgorithm
         # TODO: DISCONNECT!!!!
         sol = DiffEqBase.build_solution(prob, alg, sde_integrator.sol.t,
-                                        sde_integrator.sol.u, W = W,
-                                        stats = stats, saved_subsystem = saved_subsystem,
-                                        calculate_error = false, alg_choice = alg_choice,
-                                        interp = id, dense = dense, seed = _seed)
+            sde_integrator.sol.u, W = W,
+            stats = stats, saved_subsystem = saved_subsystem,
+            calculate_error = false, alg_choice = alg_choice,
+            interp = id, dense = dense, seed = _seed)
         # separate statistics of the integrator and the history
     else
         # TODO: DISCONNECT!!!!
         sol = DiffEqBase.build_solution(prob, alg, sde_integrator.sol.t,
-                                        sde_integrator.sol.u, W = W,
-                                        stats = stats, saved_subsystem = saved_subsystem,
-                                        calculate_error = false,
-                                        interp = id, dense = dense, seed = _seed)
+            sde_integrator.sol.u, W = W,
+            stats = stats, saved_subsystem = saved_subsystem,
+            calculate_error = false,
+            interp = id, dense = dense, seed = _seed)
         # separate statistics of the integrator and the history
     end
 
@@ -463,31 +466,31 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     q = tTypeNoUnits(1)
 
     integrator = SDDEIntegrator{typeof(getalg(alg)), isinplace(prob), uType,
-                                uBottomEltype, tType, typeof(p), typeof(eigen_est),
-                                QT, uEltypeNoUnits, typeof(W), typeof(P),
-                                rateType, typeof(sol), typeof(cache), FType, GType,
-                                typeof(c),
-                                typeof(opts), typeof(noise), typeof(last_event_error),
-                                typeof(callback_cache), typeof(history),
-                                typeof(sde_integrator), typeof(initializealg)}(f_with_history,
-                                                        g_with_history, c, noise, uprev,
-                                                        tprev,
-                                                        order_discontinuity_t0,
-                                                        tracked_discontinuities,
-                                                        t, u, p, tType(dt), tType(dt),
-                                                        tType(dt), dtcache, tspan[2], tdir,
-                                                        just_hit_tstop, do_error_check,
-                                                        isout, event_last_time,
-                                                        vector_event_last_time,
-                                                        last_event_error, accept_step,
-                                                        last_stepfail, force_stepfail,
-                                                        dtchangeable, u_modified, saveiter,
-                                                        getalg(alg), sol,
-                                                        cache, callback_cache, tType(dt), W,
-                                                        P,
-                                                        opts, iter, success_iter, eigen_est,
-                                                        EEst, q, QT(qoldinit), q11, history,
-                                                        stats, sde_integrator, initializealg)
+        uBottomEltype, tType, typeof(p), typeof(eigen_est),
+        QT, uEltypeNoUnits, typeof(W), typeof(P),
+        rateType, typeof(sol), typeof(cache), FType, GType,
+        typeof(c),
+        typeof(opts), typeof(noise), typeof(last_event_error),
+        typeof(callback_cache), typeof(history),
+        typeof(sde_integrator), typeof(initializealg)}(f_with_history,
+        g_with_history, c, noise, uprev,
+        tprev,
+        order_discontinuity_t0,
+        tracked_discontinuities,
+        t, u, p, tType(dt), tType(dt),
+        tType(dt), dtcache, tspan[2], tdir,
+        just_hit_tstop, do_error_check,
+        isout, event_last_time,
+        vector_event_last_time,
+        last_event_error, accept_step,
+        last_stepfail, force_stepfail,
+        dtchangeable, u_modified, saveiter,
+        getalg(alg), sol,
+        cache, callback_cache, tType(dt), W,
+        P,
+        opts, iter, success_iter, eigen_est,
+        EEst, q, QT(qoldinit), q11, history,
+        stats, sde_integrator, initializealg)
 
     if initialize_integrator
         DiffEqBase.initialize_dae!(integrator)
@@ -518,7 +521,8 @@ function DiffEqBase.solve!(integrator::SDDEIntegrator)
             if DiffEqBase.check_error!(integrator) != ReturnCode.Success
                 return integrator.sol
             end
-            if !isempty(integrator.sol.prob.constant_lags) && integrator.dt > minimum(integrator.sol.prob.constant_lags) &&
+            if !isempty(integrator.sol.prob.constant_lags) &&
+               integrator.dt > minimum(integrator.sol.prob.constant_lags) &&
                !(integrator.alg <: StochasticDiffEq.EM)
                 error("dt > minimum(constant_lags). This is not allowed by the integrator. Please dt `dtmax` less than the minimum lag or use `EM`.")
             end
@@ -537,8 +541,8 @@ function DiffEqBase.solve!(integrator::SDDEIntegrator)
 
     if DiffEqBase.has_analytic(f)
         DiffEqBase.calculate_solution_errors!(integrator.sol;
-                                              timeseries_errors = integrator.opts.timeseries_errors,
-                                              dense_errors = integrator.opts.dense_errors)
+            timeseries_errors = integrator.opts.timeseries_errors,
+            dense_errors = integrator.opts.dense_errors)
     end
     if integrator.sol.retcode != :Default
         return integrator.sol
@@ -548,8 +552,8 @@ end
 
 # function StochasticDiffEq.tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan)
 function tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan,
-                                    order_discontinuity_t0, alg_maximum_order,
-                                    constant_lags, neutral)
+        order_discontinuity_t0, alg_maximum_order,
+        constant_lags, neutral)
     tType = eltype(tspan)
     t0, tf = tspan
     tdir = sign(tf - t0)
@@ -615,7 +619,7 @@ function tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan,
     d_discontinuities_internal = BinaryMinHeap{Discontinuity{tType, Rational{Int}}}()
     if add_propagated_constant_lags
         sizehint!(d_discontinuities_internal.valtree,
-                  length(d_discontinuities) + length(constant_lags))
+            length(d_discontinuities) + length(constant_lags))
     else
         sizehint!(d_discontinuities_internal.valtree, length(d_discontinuities))
     end
@@ -625,7 +629,7 @@ function tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan,
 
         if tdir_t0 < tdir_t < tdir_tf && d.order ≤ alg_maximum_order + 1
             push!(d_discontinuities_internal,
-                  Discontinuity{tType, Rational{Int}}(tdir_t, d.order))
+                Discontinuity{tType, Rational{Int}}(tdir_t, d.order))
         end
     end
 
@@ -633,7 +637,7 @@ function tstop_saveat_disc_handling(tstops, saveat, d_discontinuities, tspan,
         for lag in constant_lags
             if tdir * lag < maxlag
                 push!(d_discontinuities_internal,
-                      Discontinuity{tType, Rational{Int}}(tdir * (t0 + lag), next_order))
+                    Discontinuity{tType, Rational{Int}}(tdir * (t0 + lag), next_order))
             end
         end
     end
