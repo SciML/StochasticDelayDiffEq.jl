@@ -4,8 +4,8 @@ function stepsize_controller!(integrator::SDDEIntegrator, controller::PIControll
     integrator.q = DiffEqBase.value(integrator.q11 /
                                     FastPower.fastpower(integrator.qold, controller.beta2))
     @fastmath integrator.q = DiffEqBase.value(max(inv(integrator.opts.qmax),
-                                                  min(inv(integrator.opts.qmin),
-                                                      integrator.q / integrator.opts.gamma)))
+        min(inv(integrator.opts.qmin),
+            integrator.q / integrator.opts.gamma)))
 end
 
 @inline function step_accept_controller!(integrator::SDDEIntegrator, alg)
@@ -19,5 +19,5 @@ end
 
 function step_reject_controller!(integrator::SDDEIntegrator, controller::PIController, alg)
     integrator.dtnew = integrator.dt / min(inv(integrator.opts.qmin),
-                           integrator.q11 / integrator.opts.gamma)
+        integrator.q11 / integrator.opts.gamma)
 end

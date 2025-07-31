@@ -40,8 +40,9 @@ end
     elseif integrator.opts.adaptive
         stepsize_controller!(integrator, getalg(integrator.alg))
         integrator.isout = integrator.opts.isoutofdomain(integrator.u, integrator.p, ttmp)
-        integrator.accept_step = (!integrator.isout && accept_step_controller(integrator,
-                                                         integrator.opts.controller)) ||
+        integrator.accept_step = (!integrator.isout &&
+                                  accept_step_controller(integrator,
+            integrator.opts.controller)) ||
                                  (integrator.opts.force_dtmin &&
                                   integrator.dt <= integrator.opts.dtmin)
         if integrator.accept_step # Accepted
@@ -76,11 +77,11 @@ end
     end
     if integrator.opts.progress && integrator.iter % integrator.opts.progress_steps == 0
         @logmsg(-1,
-                integrator.opts.progress_name,
-                _id=:StochasticDelayDiffEq,
-                message=integrator.opts.progress_message(integrator.dt, integrator.u,
-                                                         integrator.p, integrator.t),
-                progress=integrator.t / integrator.sol.prob.tspan[2])
+            integrator.opts.progress_name,
+            _id=:StochasticDelayDiffEq,
+            message=integrator.opts.progress_message(integrator.dt, integrator.u,
+                integrator.p, integrator.t),
+            progress=integrator.t/integrator.sol.prob.tspan[2])
     end
 end
 
@@ -90,11 +91,11 @@ end
     resize!(integrator.sol.u, integrator.saveiter)
     if integrator.opts.progress
         @logmsg(-1,
-                integrator.opts.progress_name,
-                _id=:StochasticDiffEq,
-                message=integrator.opts.progress_message(integrator.dt, integrator.u,
-                                                         integrator.p, integrator.t),
-                progress="done")
+            integrator.opts.progress_name,
+            _id=:StochasticDiffEq,
+            message=integrator.opts.progress_message(integrator.dt, integrator.u,
+                integrator.p, integrator.t),
+            progress="done")
     end
     return nothing
 end
@@ -114,20 +115,20 @@ function DiffEqBase.auto_dt_reset!(integrator::SDDEIntegrator)
 
     # determine initial time step
     sde_prob = SDEProblem(f, g, prob.u0, prob.tspan, prob.p;
-                          noise_rate_prototype = prob.noise_rate_prototype,
-                          noise = prob.noise,
-                          seed = prob.seed,
-                          prob.kwargs...)
+        noise_rate_prototype = prob.noise_rate_prototype,
+        noise = prob.noise,
+        seed = prob.seed,
+        prob.kwargs...)
     integrator.dt = StochasticDiffEq.sde_determine_initdt(integrator.u, integrator.t,
-                                                          integrator.tdir,
-                                                          integrator.opts.dtmax,
-                                                          integrator.opts.abstol,
-                                                          integrator.opts.reltol,
-                                                          integrator.opts.internalnorm,
-                                                          sde_prob,
-                                                          StochasticDiffEq.get_current_alg_order(getalg(integrator.alg),
-                                                                                                 integrator.cache),
-                                                          integrator)
+        integrator.tdir,
+        integrator.opts.dtmax,
+        integrator.opts.abstol,
+        integrator.opts.reltol,
+        integrator.opts.internalnorm,
+        sde_prob,
+        StochasticDiffEq.get_current_alg_order(getalg(integrator.alg),
+            integrator.cache),
+        integrator)
     # update statistics
     # destats.nf += 2
     # destats.nf2 += 2
@@ -137,19 +138,19 @@ end
 
 DiffEqBase.has_reinit(integrator::SDDEIntegrator) = false # TODO true - synchronize with DDE!
 function DiffEqBase.reinit!(integrator::SDDEIntegrator, u0 = integrator.sol.prob.u0;
-                            t0 = integrator.sol.prob.tspan[1],
-                            tf = integrator.sol.prob.tspan[2],
-                            erase_sol = true,
-                            tstops = integrator.opts.tstops_cache,
-                            saveat = integrator.opts.saveat_cache,
-                            d_discontinuities = integrator.opts.d_discontinuities_cache,
-                            order_discontinuity_t0 = t0 == integrator.sol.prob.tspan[1] &&
-                                u0 == integrator.sol.prob.u0 ?
-                                                     integrator.order_discontinuity_t0 : 0,
-                            reinit_cache = true, reinit_callbacks = true,
-                            initialize_save = true,
-                            reset_dt = (integrator.dtcache == zero(integrator.dt)) &&
-                                integrator.opts.adaptive)
+        t0 = integrator.sol.prob.tspan[1],
+        tf = integrator.sol.prob.tspan[2],
+        erase_sol = true,
+        tstops = integrator.opts.tstops_cache,
+        saveat = integrator.opts.saveat_cache,
+        d_discontinuities = integrator.opts.d_discontinuities_cache,
+        order_discontinuity_t0 = t0 == integrator.sol.prob.tspan[1] &&
+                                 u0 == integrator.sol.prob.u0 ?
+                                 integrator.order_discontinuity_t0 : 0,
+        reinit_cache = true, reinit_callbacks = true,
+        initialize_save = true,
+        reset_dt = (integrator.dtcache == zero(integrator.dt)) &&
+                   integrator.opts.adaptive)
     if DiffEqBase.isinplace(integrator.sol.prob)
         recursivecopy!(integrator.u, u0)
         recursivecopy!(integrator.uprev, integrator.u)
@@ -163,15 +164,16 @@ function DiffEqBase.reinit!(integrator::SDDEIntegrator, u0 = integrator.sol.prob
 
     tType = typeof(integrator.t)
     maximum_order = StochasticDiffEq.alg_order(getalg(integrator.alg))
-    tstops_internal, saveat_internal, d_discontinuities_internal = tstop_saveat_disc_handling(tstops,
-                                                                                              saveat,
-                                                                                              d_discontinuities,
-                                                                                              (tType(t0),
-                                                                                               tType(tf)),
-                                                                                              order_discontinuity_t0,
-                                                                                              maximum_order,
-                                                                                              integrator.sol.prob.constant_lags,
-                                                                                              integrator.sol.prob.neutral)
+    tstops_internal, saveat_internal,
+    d_discontinuities_internal = tstop_saveat_disc_handling(tstops,
+        saveat,
+        d_discontinuities,
+        (tType(t0),
+            tType(tf)),
+        order_discontinuity_t0,
+        maximum_order,
+        integrator.sol.prob.constant_lags,
+        integrator.sol.prob.neutral)
 
     integrator.opts.tstops = tstops_internal
     integrator.opts.saveat = saveat_internal
@@ -197,9 +199,10 @@ function DiffEqBase.reinit!(integrator::SDDEIntegrator, u0 = integrator.sol.prob
 
         if order_discontinuity_t0 ≤ maximum_order
             resize!(integrator.tracked_discontinuities, 1)
-            integrator.tracked_discontinuities[1] = Discontinuity(integrator.tdir *
-                                                                  integrator.t,
-                                                                  Rational{Int}(order_discontinuity_t0))
+            integrator.tracked_discontinuities[1] = Discontinuity(
+                integrator.tdir *
+                integrator.t,
+                Rational{Int}(order_discontinuity_t0))
         else
             resize!(integrator.tracked_discontinuities, 0)
         end
@@ -235,7 +238,7 @@ end
 end
 
 @inline function DiffEqBase.get_du!(out, integrator::SDDEIntegrator)
-    DiffEqBase.@.. out = (integrator.u - integrator.uprev) / integrator.dt
+    @.. out = (integrator.u - integrator.uprev) / integrator.dt
 end
 
 @inline function DiffEqBase.add_tstop!(integrator::SDDEIntegrator, t)
@@ -245,11 +248,11 @@ end
 end
 
 function DiffEqBase.change_t_via_interpolation!(integrator::SDDEIntegrator, t,
-                                                modify_save_endpoint::Type{Val{T}} = Val{
-                                                                                         false
-                                                                                         }) where {
-                                                                                                   T
-                                                                                                   }
+        modify_save_endpoint::Type{Val{T}} = Val{
+            false
+        }) where {
+        T
+}
     StochasticDiffEq.change_t_via_interpolation!(integrator, t, modify_save_endpoint)
 end
 
@@ -261,15 +264,16 @@ function StochasticDiffEq.handle_callback_modifiers!(integrator::SDDEIntegrator)
             oldrate = integrator.P.cache.currate
             integrator.P.cache.rate(oldrate, integrator.u, integrator.p, integrator.t)
         else
-            integrator.P.cache.currate = integrator.P.cache.rate(integrator.u, integrator.p,
-                                                                 integrator.t)
+            integrator.P.cache.currate = integrator.P.cache.rate(
+                integrator.u, integrator.p,
+                integrator.t)
         end
     end
 
     # update heap of discontinuities
     # discontinuity is assumed to be of order 0, i.e. solution x is discontinuous
     push!(integrator.opts.d_discontinuities,
-          Discontinuity(integrator.tdir * integrator.t, 0 // 1))
+        Discontinuity(integrator.tdir * integrator.t, 0 // 1))
 end
 
 function DiffEqBase.u_modified!(integrator::SDDEIntegrator, bool::Bool)
@@ -283,7 +287,7 @@ function DiffEqBase.set_proposed_dt!(integrator::SDDEIntegrator, dt::Number)
 end
 
 function DiffEqBase.set_proposed_dt!(integrator::SDDEIntegrator,
-                                     integrator2::SDDEIntegrator)
+        integrator2::SDDEIntegrator)
     integrator.dtpropose = integrator2.dtpropose
     integrator.qold = integrator2.qold
 end
@@ -296,7 +300,7 @@ end
             copyat_or_push!(integrator.sol.u, integrator.saveiter, integrator.u)
         else
             copyat_or_push!(integrator.sol.u, integrator.saveiter,
-                            integrator.u[integrator.opts.save_idxs], Val{false})
+                integrator.u[integrator.opts.save_idxs], Val{false})
         end
     end
 
@@ -313,7 +317,7 @@ function DiffEqBase.postamble!(integrator::SDDEIntegrator)
 end
 
 @inline function DiffEqBase.savevalues!(integrator::SDDEIntegrator,
-                                        force_save = false)::Tuple{Bool, Bool}
+        force_save = false)::Tuple{Bool, Bool}
     saved, savedexactly = false, false
     !integrator.opts.save_on && return saved, savedexactly
     tdir_t = integrator.tdir * integrator.t
@@ -323,14 +327,15 @@ end
         curt = integrator.tdir * pop!(integrator.opts.saveat)
         if curt != integrator.t # If <t, interpolate
             Θ = (curt - integrator.tprev) / integrator.dt
-            val = StochasticDiffEq.sde_interpolant(Θ, integrator, integrator.opts.save_idxs,
-                                                   Val{0}) # out of place, but force copy later
+            val = StochasticDiffEq.sde_interpolant(
+                Θ, integrator, integrator.opts.save_idxs,
+                Val{0}) # out of place, but force copy later
             save_val = val
             copyat_or_push!(integrator.sol.t, integrator.saveiter, curt)
             copyat_or_push!(integrator.sol.u, integrator.saveiter, save_val, Val{false})
             if integrator.alg isa StochasticDiffEq.StochasticDiffEqCompositeAlgorithm
                 copyat_or_push!(integrator.sol.alg_choice, integrator.saveiter,
-                                integrator.cache.current)
+                    integrator.cache.current)
             end
         else # ==t, just save
             savedexactly = true
@@ -339,13 +344,13 @@ end
                 copyat_or_push!(integrator.sol.u, integrator.saveiter, integrator.u)
             else
                 copyat_or_push!(integrator.sol.u, integrator.saveiter,
-                                integrator.u[integrator.opts.save_idxs], Val{false})
+                    integrator.u[integrator.opts.save_idxs], Val{false})
             end
             if integrator.alg isa
                Union{StochasticDiffEq.StochasticDiffEqCompositeAlgorithm,
-                     StochasticDiffEq.StochasticDiffEqRODECompositeAlgorithm}
+                StochasticDiffEq.StochasticDiffEqRODECompositeAlgorithm}
                 copyat_or_push!(integrator.sol.alg_choice, integrator.saveiter,
-                                integrator.cache.current)
+                    integrator.cache.current)
             end
         end
     end
@@ -356,14 +361,14 @@ end
             copyat_or_push!(integrator.sol.u, integrator.saveiter, integrator.u)
         else
             copyat_or_push!(integrator.sol.u, integrator.saveiter,
-                            integrator.u[integrator.opts.save_idxs], Val{false})
+                integrator.u[integrator.opts.save_idxs], Val{false})
         end
         copyat_or_push!(integrator.sol.t, integrator.saveiter, integrator.t)
         if integrator.alg isa
            Union{StochasticDiffEq.StochasticDiffEqCompositeAlgorithm,
-                 StochasticDiffEq.StochasticDiffEqRODECompositeAlgorithm}
+            StochasticDiffEq.StochasticDiffEqRODECompositeAlgorithm}
             copyat_or_push!(integrator.sol.alg_choice, integrator.saveiter,
-                            integrator.cache.current)
+                integrator.cache.current)
         end
     end
     return saved, savedexactly
@@ -377,7 +382,7 @@ end
 end
 
 @inline function DiffEqNoiseProcess.reject_step!(integrator::SDDEIntegrator,
-                                                 dtnew = integrator.dtnew)
+        dtnew = integrator.dtnew)
     !isnothing(integrator.W) &&
         reject_step!(integrator.W, dtnew, integrator.u, integrator.p)
     !isnothing(integrator.P) &&
@@ -401,20 +406,20 @@ end
 end
 # avoid method ambiguity
 for typ in (StochasticDiffEq.StochasticDiffEqAlgorithm,
-            StochasticDiffEq.StochasticDiffEqNewtonAdaptiveAlgorithm)
+    StochasticDiffEq.StochasticDiffEqNewtonAdaptiveAlgorithm)
     @eval @inline function DiffEqBase.get_tmp_cache(integrator::SDDEIntegrator, alg::$typ,
-                                                    cache::StochasticDiffEq.StochasticDiffEqConstantCache)
+            cache::StochasticDiffEq.StochasticDiffEqConstantCache)
         nothing
     end
 end
 @inline DiffEqBase.get_tmp_cache(integrator::SDDEIntegrator, alg, cache) = (cache.tmp,)
 @inline function DiffEqBase.get_tmp_cache(integrator::SDDEIntegrator,
-                                          alg::StochasticDiffEq.StochasticDiffEqNewtonAdaptiveAlgorithm,
-                                          cache)
+        alg::StochasticDiffEq.StochasticDiffEqNewtonAdaptiveAlgorithm,
+        cache)
     (cache.nlsolver.tmp, cache.nlsolver.ztmp)
 end
 @inline function DiffEqBase.get_tmp_cache(integrator::SDDEIntegrator,
-                                          alg::StochasticDiffEq.StochasticCompositeAlgorithm,
-                                          cache)
+        alg::StochasticDiffEq.StochasticCompositeAlgorithm,
+        cache)
     get_tmp_cache(integrator, alg.algs[1], cache.caches[1])
 end

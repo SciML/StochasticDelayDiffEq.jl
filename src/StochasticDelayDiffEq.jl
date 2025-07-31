@@ -17,7 +17,7 @@ import FastPower
 import SciMLBase
 using DiffEqBase: AbstractSDDEProblem, AbstractSDDEAlgorithm, AbstractRODESolution,
                   AbstractRODEFunction, AbstractSDEIntegrator, AbstractSDDEIntegrator,
-                  DEIntegrator, DEAlgorithm, AbstractRODEAlgorithm, AbstractSDEAlgorithm
+                  DEIntegrator, DEAlgorithm, AbstractRODEAlgorithm, AbstractSDEAlgorithm, @..
 
 import DelayDiffEq: constant_extrapolant!, constant_extrapolant,
                     AbstractMethodOfStepsAlgorithm, iscomposite, MethodOfSteps

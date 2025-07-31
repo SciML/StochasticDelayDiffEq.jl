@@ -8,8 +8,9 @@ end
 (g::SDEDiffusionTermWrapper{true})(du, u, p, t) = g.g(du, u, g.h, p, t)
 (g::SDEDiffusionTermWrapper{false})(u, p, t) = g.g(u, g.h, p, t)
 
-struct SDEFunctionWrapper{iip, F, G, H, TMM, Ta, Tt, TJ, JVP, VJP, JP, SP, TW, TWt, TPJ, GG,
-                          TCV, ID, S} <: DiffEqBase.AbstractRODEFunction{iip}
+struct SDEFunctionWrapper{
+    iip, F, G, H, TMM, Ta, Tt, TJ, JVP, VJP, JP, SP, TW, TWt, TPJ, GG,
+    TCV, ID, S} <: DiffEqBase.AbstractRODEFunction{iip}
     f::F
     g::G
     h::H
@@ -51,13 +52,13 @@ function wrap_functions_and_history(f::SDDEFunction, g, h)
     end
 
     SDEFunctionWrapper{isinplace(f), typeof(f.f), typeof(gwh), typeof(h),
-                       typeof(f.mass_matrix),
-                       typeof(f.analytic), typeof(f.tgrad), typeof(jac), typeof(f.jvp),
-                       typeof(f.vjp), typeof(f.jac_prototype), typeof(f.sparsity),
-                       typeof(f.Wfact), typeof(f.Wfact_t), typeof(f.paramjac),
-                       typeof(f.ggprime), typeof(f.colorvec), typeof(f.initialization_data),
-                       typeof(f.sys)}(f.f, gwh, h, f.mass_matrix, f.analytic, f.tgrad, jac,
-                       f.jvp, f.vjp, f.jac_prototype, f.sparsity, f.Wfact, f.Wfact_t, f.paramjac,
-                       f.ggprime, f.colorvec, f.initialization_data, f.sys),
+        typeof(f.mass_matrix),
+        typeof(f.analytic), typeof(f.tgrad), typeof(jac), typeof(f.jvp),
+        typeof(f.vjp), typeof(f.jac_prototype), typeof(f.sparsity),
+        typeof(f.Wfact), typeof(f.Wfact_t), typeof(f.paramjac),
+        typeof(f.ggprime), typeof(f.colorvec), typeof(f.initialization_data),
+        typeof(f.sys)}(f.f, gwh, h, f.mass_matrix, f.analytic, f.tgrad, jac,
+        f.jvp, f.vjp, f.jac_prototype, f.sparsity, f.Wfact, f.Wfact_t, f.paramjac,
+        f.ggprime, f.colorvec, f.initialization_data, f.sys),
     gwh
 end
