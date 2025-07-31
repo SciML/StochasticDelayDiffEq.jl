@@ -54,10 +54,10 @@ Return arrays of saved time points, states, and rates, initialized with the solu
 first time point if `save_start = true` (the default).
 """
 function solution_arrays(u::uType, tspan, rate_prototype;
-                         timeseries_init = typeof(u)[],
-                         ts_init = eltype(tspan)[],
-                         save_idxs = nothing,
-                         save_start = true) where {uType}
+        timeseries_init = typeof(u)[],
+        ts_init = eltype(tspan)[],
+        save_idxs = nothing,
+        save_start = true) where {uType}
     # determine types of time and state
     # uType = typeof(u)
     tType = eltype(tspan)
@@ -108,10 +108,10 @@ Suggest that solution `sol` reserves capacity for a number of elements that
 depends on the parameter settings of the numerical solver.
 """
 function Base.sizehint!(sol::RODESolution, alg, tspan, tstops, saveat;
-                        save_everystep = isempty(saveat),
-                        adaptive = StochasticDiffEq.isadaptive(getalg(alg)),
-                        internalnorm = DiffEqBase.ODE_DEFAULT_NORM,
-                        dt = zero(eltype(tspan)))
+        save_everystep = isempty(saveat),
+        adaptive = StochasticDiffEq.isadaptive(getalg(alg)),
+        internalnorm = DiffEqBase.ODE_DEFAULT_NORM,
+        dt = zero(eltype(tspan)))
     # obtain integration time
     t0 = first(tspan)
     integrationtime = last(tspan) - t0
@@ -137,11 +137,11 @@ function Base.sizehint!(sol::RODESolution, alg, tspan, tstops, saveat;
 end
 
 function build_history_function(prob, alg, reltol, rate_prototype, noise_rate_prototype,
-                                jump_prototype, W, _seed, dense;
-                                dt = zero(eltype(prob.tspan)),
-                                adaptive = StochasticDiffEq.isadaptive(getalg(alg)),
-                                calck = false,
-                                internalnorm = DiffEqBase.ODE_DEFAULT_NORM)
+        jump_prototype, W, _seed, dense;
+        dt = zero(eltype(prob.tspan)),
+        adaptive = StochasticDiffEq.isadaptive(getalg(alg)),
+        calck = false,
+        internalnorm = DiffEqBase.ODE_DEFAULT_NORM)
     @unpack f, g, h, u0, tspan, p = prob
 
     t0 = first(tspan)
@@ -170,52 +170,53 @@ function build_history_function(prob, alg, reltol, rate_prototype, noise_rate_pr
     sde_u, sde_uprev = u_uprev(u0; alias_u0 = false)
 
     # # initialize output arrays
-    sde_ts, sde_timeseries, sde_saveiter = solution_arrays(sde_u, tspan, rate_prototype,
-                                                           save_idxs = nothing,
-                                                           save_start = true)
+    sde_ts, sde_timeseries,
+    sde_saveiter = solution_arrays(sde_u, tspan, rate_prototype,
+        save_idxs = nothing,
+        save_start = true)
 
     # # obtain cache (we alias uprev2 and uprev)
     sde_cache = StochasticDiffEq.alg_cache(getalg(alg), prob, sde_u, W.dW, W.dZ, p,
-                                           rate_prototype, noise_rate_prototype,
-                                           jump_prototype, uEltypeNoUnits,
-                                           uBottomEltypeNoUnits, tTypeNoUnits, sde_uprev, f,
-                                           t0, dt, Val{isinplace(prob)})
+        rate_prototype, noise_rate_prototype,
+        jump_prototype, uEltypeNoUnits,
+        uBottomEltypeNoUnits, tTypeNoUnits, sde_uprev, f,
+        t0, dt, Val{isinplace(prob)})
 
     # build dense interpolation of history
     id = StochasticDiffEq.LinearInterpolationData(sde_timeseries, sde_ts)
     if typeof(getalg(alg)) <: StochasticDiffEq.StochasticDiffEqCompositeAlgorithm
         alg_choice = Int[]
         sde_sol = DiffEqBase.build_solution(prob, alg, sde_ts, sde_timeseries, W = W,
-                                            stats = DiffEqBase.Stats(0),
-                                            calculate_error = false,
-                                            alg_choice = alg_choice,
-                                            interp = id, dense = dense, seed = _seed)
+            stats = DiffEqBase.Stats(0),
+            calculate_error = false,
+            alg_choice = alg_choice,
+            interp = id, dense = dense, seed = _seed)
     else
         sde_sol = DiffEqBase.build_solution(prob, alg, sde_ts, sde_timeseries, W = W,
-                                            stats = DiffEqBase.Stats(0),
-                                            calculate_error = false,
-                                            interp = id, dense = dense, seed = _seed)
+            stats = DiffEqBase.Stats(0),
+            calculate_error = false,
+            interp = id, dense = dense, seed = _seed)
     end
 
     # # reserve capacity
     sizehint!(sde_sol, getalg(alg), tspan, (), ();
-              save_everystep = true, adaptive = adaptive, internalnorm = internalnorm,
-              dt = tType(dt))
+        save_everystep = true, adaptive = adaptive, internalnorm = internalnorm,
+        dt = tType(dt))
 
     # # create simple integrator
     sde_integrator = HistorySDEIntegrator{typeof(getalg(alg)), isinplace(prob),
-                                          typeof(prob.u0),
-                                          tType, typeof(sde_sol), typeof(sde_cache)}(sde_sol,
-                                                                                     sde_u,
-                                                                                     t0,
-                                                                                     zero(tType),
-                                                                                     sde_uprev,
-                                                                                     t0,
-                                                                                     getalg(alg),
-                                                                                     zero(tType),
-                                                                                     tdir,
-                                                                                     1,
-                                                                                     sde_cache)
+        typeof(prob.u0),
+        tType, typeof(sde_sol), typeof(sde_cache)}(sde_sol,
+        sde_u,
+        t0,
+        zero(tType),
+        sde_uprev,
+        t0,
+        getalg(alg),
+        zero(tType),
+        tdir,
+        1,
+        sde_cache)
 
     # # combine the user-provided history function and the ODE integrator with dense solution
     # # to a joint dense history of the DDE
