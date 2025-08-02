@@ -22,7 +22,7 @@ StochasticDiffEq = "789caeaf-c7a9-5a7d-9973-96adeb23e2a0"
 UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 
 [compat]
-DataStructures = "0.18"
+DataStructures = "0.18, 0.19"
 DelayDiffEq = "5.28.3"
 DiffEqBase = "6.122"
 DiffEqNoiseProcess = "5"
