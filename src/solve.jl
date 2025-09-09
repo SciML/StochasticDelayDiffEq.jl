@@ -495,6 +495,9 @@ function DiffEqBase.__init(prob::AbstractSDDEProblem,# TODO DiffEqBasee.Abstract
     if initialize_integrator
         DiffEqBase.initialize_dae!(integrator)
         StochasticDiffEq.initialize_callbacks!(integrator, initialize_save)
+        if save_on && save_start
+            SciMLBase.save_discretes_if_enabled!(integrator, opts.callback; skip_duplicates = true)
+        end
         initialize!(integrator, integrator.cache)
 
         save_start && alg isa StochasticDiffEq.StochasticDiffEqCompositeAlgorithm &&
