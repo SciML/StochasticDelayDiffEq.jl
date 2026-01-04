@@ -1,5 +1,5 @@
 mutable struct HistorySDEIntegrator{algType, IIP, uType, tType, SolType, CacheType} <:
-               AbstractSDEIntegrator{algType, IIP, uType, tType}
+    AbstractSDEIntegrator{algType, IIP, uType, tType}
     sol::SolType
     u::uType
     t::tType
@@ -14,20 +14,24 @@ mutable struct HistorySDEIntegrator{algType, IIP, uType, tType, SolType, CacheTy
 end
 
 function (integrator::HistorySDEIntegrator)(t, deriv::Type = Val{0}; idxs = nothing)
-    StochasticDiffEq.current_interpolant(t, integrator, idxs, deriv)
+    return StochasticDiffEq.current_interpolant(t, integrator, idxs, deriv)
 end
 
-function (integrator::HistorySDEIntegrator)(val::AbstractArray,
+function (integrator::HistorySDEIntegrator)(
+        val::AbstractArray,
         t::Union{Number, AbstractArray},
-        deriv::Type = Val{0}; idxs = nothing)
-    StochasticDiffEq.current_interpolant!(val, t, integrator, idxs, deriv)
+        deriv::Type = Val{0}; idxs = nothing
+    )
+    return StochasticDiffEq.current_interpolant!(val, t, integrator, idxs, deriv)
 end
 
-mutable struct SDDEIntegrator{algType, IIP, uType, uEltype, tType, P, eigenType,
-    tTypeNoUnits, uEltypeNoUnits, randType, randType2, rateType,
-    solType, cacheType, F, G, F6, OType, noiseType,
-    EventErrorType, CallbackCacheType, H, IType, IA} <:
-               AbstractSDDEIntegrator{algType, IIP, uType, tType}
+mutable struct SDDEIntegrator{
+        algType, IIP, uType, uEltype, tType, P, eigenType,
+        tTypeNoUnits, uEltypeNoUnits, randType, randType2, rateType,
+        solType, cacheType, F, G, F6, OType, noiseType,
+        EventErrorType, CallbackCacheType, H, IType, IA,
+    } <:
+    AbstractSDDEIntegrator{algType, IIP, uType, tType}
     f::F
     g::G
     c::F6
@@ -85,10 +89,12 @@ mutable struct SDDEIntegrator{algType, IIP, uType, uEltype, tType, P, eigenType,
 end
 
 function (integrator::SDDEIntegrator)(t, deriv::Type = Val{0}; idxs = nothing)
-    StochasticDiffEq.current_interpolant(t, integrator, idxs, deriv)
+    return StochasticDiffEq.current_interpolant(t, integrator, idxs, deriv)
 end
 
-function (integrator::SDDEIntegrator)(val::AbstractArray, t::Union{Number, AbstractArray},
-        deriv::Type = Val{0}; idxs = nothing)
-    StochasticDiffEq.current_interpolant!(val, t, integrator, idxs, deriv)
+function (integrator::SDDEIntegrator)(
+        val::AbstractArray, t::Union{Number, AbstractArray},
+        deriv::Type = Val{0}; idxs = nothing
+    )
+    return StochasticDiffEq.current_interpolant!(val, t, integrator, idxs, deriv)
 end

@@ -1,6 +1,6 @@
 @inline function handle_tstop!(integrator)
     tstops = integrator.opts.tstops
-    if !isempty(tstops)
+    return if !isempty(tstops)
         tdir_t = integrator.tdir * integrator.t
         tdir_ts_top = first(tstops)
         if tdir_t == tdir_ts_top
@@ -8,8 +8,10 @@
             integrator.just_hit_tstop = true
         elseif tdir_t > tdir_ts_top
             if !integrator.dtchangeable
-                change_t_via_interpolation!(integrator, integrator.tdir * pop!(tstops),
-                    Val{true})
+                change_t_via_interpolation!(
+                    integrator, integrator.tdir * pop!(tstops),
+                    Val{true}
+                )
                 integrator.just_hit_tstop = true
             else
                 error("Something went wrong. Integrator stepped past tstops but the algorithm was dtchangeable. Please report this error.")
@@ -43,7 +45,7 @@ function handle_discontinuities!(integrator::SDDEIntegrator)
     d = pop!(integrator.opts.d_discontinuities)
     order = d.order
     while !isempty(integrator.opts.d_discontinuities) &&
-        first(integrator.opts.d_discontinuities) == integrator.tdir * integrator.t
+            first(integrator.opts.d_discontinuities) == integrator.tdir * integrator.t
         d2 = pop!(integrator.opts.d_discontinuities)
         order = min(order, d2.order)
     end
@@ -55,23 +57,25 @@ function handle_discontinuities!(integrator::SDDEIntegrator)
         maxΔt = 10eps(integrator.t)
 
         while !isempty(integrator.opts.d_discontinuities) &&
-            abs(first(integrator.opts.d_discontinuities).t -
-                integrator.tdir * integrator.t) <
-            maxΔt
+                abs(
+                first(integrator.opts.d_discontinuities).t -
+                    integrator.tdir * integrator.t
+            ) <
+                maxΔt
             d2 = pop!(integrator.opts.d_discontinuities)
             order = min(order, d2.order)
         end
 
         # also remove all corresponding time stops
         while !isempty(integrator.opts.tstops) &&
-            abs(first(integrator.opts.tstops) - integrator.tdir * integrator.t) < maxΔt
+                abs(first(integrator.opts.tstops) - integrator.tdir * integrator.t) < maxΔt
             pop!(integrator.opts.tstops)
         end
     end
 
     # add discontinuities of next order to integrator
     add_next_discontinuities!(integrator, order)
-    nothing
+    return nothing
 end
 
 """
@@ -110,5 +114,5 @@ function add_next_discontinuities!(integrator, _order, t = integrator.t)
 
     # track propagated discontinuities with callback
     push!(integrator.tracked_discontinuities, Discontinuity(integrator.tdir * t, order))
-    nothing
+    return nothing
 end

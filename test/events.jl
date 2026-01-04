@@ -8,8 +8,10 @@ using Test
     prob = SDDEProblem(f, g, h, (0.0, 4.0), 0.5; constant_lags = (0.5,))
 
     # event at `t = 3`
-    cb = DiscreteCallback((u, t, integrator) -> t == 3,
-        integrator -> (integrator.u = -integrator.u))
+    cb = DiscreteCallback(
+        (u, t, integrator) -> t == 3,
+        integrator -> (integrator.u = -integrator.u)
+    )
 
     sol = solve(prob, RKMil(), tstops = (3,), callback = cb)
     ts = findall(x -> x == 3, sol.t)
