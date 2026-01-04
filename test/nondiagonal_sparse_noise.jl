@@ -15,7 +15,7 @@ function sir_dde!(du, u, h, p, t)
         du[2] = infection - recovery
         du[3] = recovery
     end
-    nothing
+    return nothing
 end;
 
 # Define a sparse matrix by making a dense matrix and setting some values as not zero
@@ -38,14 +38,14 @@ function sir_delayed_noise!(du, u, h, p, t)
     du[1, 1] = -sqrt(infection)
     du[2, 1] = sqrt(infection)
     du[2, 2] = -sqrt(recovery)
-    du[3, 2] = sqrt(recovery)
+    return du[3, 2] = sqrt(recovery)
 end;
 
 function condition(u, t, integrator) # Event when event_f(u,t) == 0
-    u[2]
+    return u[2]
 end;
 function affect!(integrator)
-    integrator.u[2] = 0.0
+    return integrator.u[2] = 0.0
 end;
 cb = ContinuousCallback(condition, affect!);
 
@@ -56,12 +56,14 @@ t = 0.0:δt:tmax;
 u0 = [990.0, 10.0, 0.0]; # S,I,R
 
 function sir_history(p, t)
-    [1000.0, 0.0, 0.0]
+    return [1000.0, 0.0, 0.0]
 end;
 
 p = [0.05, 10.0, 4.0]; # β,c,τ
 Random.seed!(1234);
 
-prob_sdde = SDDEProblem(sir_dde!, sir_delayed_noise!, u0, sir_history, tspan, p;
-    noise_rate_prototype = A);
+prob_sdde = SDDEProblem(
+    sir_dde!, sir_delayed_noise!, u0, sir_history, tspan, p;
+    noise_rate_prototype = A
+);
 sol_sdde = solve(prob_sdde, LambaEM(), callback = cb);
