@@ -41,5 +41,6 @@ include("functionwrapper.jl")
 include("utils.jl")
 include("solve.jl")
 include("stepsize_controllers.jl")
+include("precompile.jl")
 
 end # module
