@@ -27,6 +27,7 @@ A[3, 2] = 1
 A = SparseArrays.sparse(A);
 
 # Make `g` write the sparse matrix values
+# Use max(0, x) to prevent DomainError from sqrt when stochastic dynamics cause negative values
 function sir_delayed_noise!(du, u, h, p, t)
     (S, I, R) = u
     (β, c, τ) = p
@@ -35,10 +36,10 @@ function sir_delayed_noise!(du, u, h, p, t)
     (Sd, Id, Rd) = h(p, t - τ) # Time delayed variables
     Nd = Sd + Id + Rd
     recovery = β * c * Id / Nd * Sd
-    du[1, 1] = -sqrt(infection)
-    du[2, 1] = sqrt(infection)
-    du[2, 2] = -sqrt(recovery)
-    return du[3, 2] = sqrt(recovery)
+    du[1, 1] = -sqrt(max(0.0, infection))
+    du[2, 1] = sqrt(max(0.0, infection))
+    du[2, 2] = -sqrt(max(0.0, recovery))
+    return du[3, 2] = sqrt(max(0.0, recovery))
 end;
 
 function condition(u, t, integrator) # Event when event_f(u,t) == 0
