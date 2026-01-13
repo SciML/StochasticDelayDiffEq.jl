@@ -276,15 +276,33 @@ end
     return push!(integrator.opts.tstops, integrator.tdir * t)
 end
 
-function DiffEqBase.change_t_via_interpolation!(
+@inline function DiffEqBase.change_t_via_interpolation!(
         integrator::SDDEIntegrator, t,
-        modify_save_endpoint::Type{Val{T}} = Val{
-            false,
-        }
-    ) where {
-        T,
-    }
-    return StochasticDiffEq.change_t_via_interpolation!(integrator, t, modify_save_endpoint)
+        modify_save_endpoint::Type{Val{T}} = Val{false},
+        reinitialize_alg = nothing
+    ) where {T}
+    # Can get rid of an allocation here with a function
+    # get_tmp_arr(integrator.cache) which gives a pointer to some
+    # cache array which can be modified.
+    return if integrator.tdir * t < integrator.tdir * integrator.tprev
+        error("Current interpolant only works between tprev and t")
+    elseif t != integrator.t
+        if integrator.u isa AbstractArray
+            integrator(integrator.u, t)
+        else
+            integrator.u = integrator(t)
+        end
+        integrator.dtnew = integrator.t - t
+        reject_step!(integrator, t - integrator.tprev) #this only changes dt and noise, so no interpolation problems
+        integrator.dt = integrator.dtnew
+        integrator.sqdt = sqrt(abs(integrator.dt))
+        integrator.t = t
+
+        # reeval_internals_due_to_modification!(integrator) # Not necessary for linear interp
+        if T
+            StochasticDiffEq.solution_endpoint_match_cur_integrator!(integrator)
+        end
+    end
 end
 
 # update integrator when u is modified by callbacks
