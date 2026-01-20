@@ -384,11 +384,22 @@ function DiffEqBase.__init(
         copyat_or_push!(alg_choice, 1, 1)
     end
 
+    # Convert verbose argument to DEVerbosity
+    if verbose isa Bool
+        verbose_internal = verbose ? DEVerbosity(Standard()) : DEVerbosity(None())
+    elseif verbose isa AbstractVerbosityPreset
+        verbose_internal = DEVerbosity(verbose)
+    elseif verbose isa DEVerbosity
+        verbose_internal = verbose
+    else
+        throw(ArgumentError("verbose must be a Bool, AbstractVerbosityPreset, or DEVerbosity"))
+    end
+
     # create a history function
     history = build_history_function(
         prob, alg, reltol_internal,
         rate_prototype, noise_rate_prototype, jump_prototype,
-        W, _seed, dense;
+        W, _seed, dense, verbose_internal;
         dt = dt, adaptive = adaptive,
         internalnorm = internalnorm
     )
@@ -400,7 +411,7 @@ function DiffEqBase.__init(
         getalg(alg), prob, u, W.dW, W.dZ, p, rate_prototype,
         noise_rate_prototype, jump_prototype, uEltypeNoUnits,
         uBottomEltypeNoUnits, tTypeNoUnits, uprev,
-        f_with_history, t, dt, Val{isinplace(prob)}
+        f_with_history, t, dt, Val{isinplace(prob)}, verbose_internal
     )
 
     # id = StochasticDiffEq.LinearInterpolationData(timeseries,ts)
@@ -456,7 +467,7 @@ function DiffEqBase.__init(
         dense, save_on, save_start, save_end, save_end_user,
         save_noise,
         callbacks_internal, isoutofdomain, unstable_check,
-        verbose, calck, force_dtmin,
+        verbose_internal, calck, force_dtmin,
         advance_to_tstop, stop_at_next_tstop
     )
 

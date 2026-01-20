@@ -12,6 +12,10 @@ import StochasticDiffEq: stepsize_controller!, accept_step_controller,
 using LinearAlgebra, StaticArrays
 using UnPack, DataStructures
 using Logging
+using SciMLLogging: AbstractVerbositySpecifier, AbstractVerbosityPreset,
+    AbstractMessageLevel, None, Minimal, Standard, Detailed, All,
+    Silent, DebugLevel, InfoLevel, WarnLevel, ErrorLevel, @SciMLMessage
+using OrdinaryDiffEqCore: DEVerbosity
 using RecursiveArrayTools
 import FastPower
 import SciMLBase

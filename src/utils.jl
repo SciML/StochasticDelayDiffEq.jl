@@ -142,7 +142,7 @@ end
 
 function build_history_function(
         prob, alg, reltol, rate_prototype, noise_rate_prototype,
-        jump_prototype, W, _seed, dense;
+        jump_prototype, W, _seed, dense, verbose;
         dt = zero(eltype(prob.tspan)),
         adaptive = StochasticDiffEq.isadaptive(getalg(alg)),
         calck = false,
@@ -189,7 +189,7 @@ function build_history_function(
         rate_prototype, noise_rate_prototype,
         jump_prototype, uEltypeNoUnits,
         uBottomEltypeNoUnits, tTypeNoUnits, sde_uprev, f,
-        t0, dt, Val{isinplace(prob)}
+        t0, dt, Val{isinplace(prob)}, verbose
     )
 
     # build dense interpolation of history

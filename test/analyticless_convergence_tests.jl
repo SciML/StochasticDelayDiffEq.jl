@@ -125,48 +125,49 @@ sim2 = analyticless_test_convergence(
 @test abs(sim2.𝒪est[:final] - 0.5) < 0.3
 
 # Test Implicit methods
+# Note: verbose=false suppresses Newton iteration warnings from nonlinear solver
 println("implicit methods")
 sim2 = analyticless_test_convergence(
     dts, prob, ImplicitEM(), test_dt, trajectories = 300,
-    use_noise_grid = false
+    use_noise_grid = false, verbose = false
 )
 @test abs(sim2.𝒪est[:final] - 0.5) < 0.3
 sim2 = analyticless_test_convergence(
     dts, prob,
     ImplicitEM(symplectic = true, theta = 1 / 2), test_dt,
-    trajectories = 300, use_noise_grid = false
+    trajectories = 300, use_noise_grid = false, verbose = false
 )
 @test abs(sim2.𝒪est[:final] - 0.5) < 0.3
 sim2 = analyticless_test_convergence(
     dts, prob, ImplicitEulerHeun(), test_dt,
-    trajectories = 300, use_noise_grid = false
+    trajectories = 300, use_noise_grid = false, verbose = false
 )
 @test abs(sim2.𝒪est[:final] - 1.0) < 0.3
 sim2 = analyticless_test_convergence(
     dts, prob,
     ImplicitEulerHeun(symplectic = true, theta = 1 / 2),
-    test_dt, trajectories = 300, use_noise_grid = false
+    test_dt, trajectories = 300, use_noise_grid = false, verbose = false
 )
 @test abs(sim2.𝒪est[:final] - 1.0) < 0.3
 sim2 = analyticless_test_convergence(
     dts, prob, ISSEM(), test_dt, trajectories = 1000,
-    use_noise_grid = false
+    use_noise_grid = false, verbose = false
 )
 @test abs(sim2.𝒪est[:final] - 0.5) < 0.35
 sim2 = analyticless_test_convergence(
     dts, prob, ISSEM(symplectic = true, theta = 1 / 2),
-    test_dt, trajectories = 500, use_noise_grid = false
+    test_dt, trajectories = 500, use_noise_grid = false, verbose = false
 )
 @test abs(sim2.𝒪est[:final] - 0.5) < 0.3
 sim2 = analyticless_test_convergence(
     dts, prob, ImplicitRKMil(), test_dt,
-    trajectories = 300, use_noise_grid = false
+    trajectories = 300, use_noise_grid = false, verbose = false
 )
 @test abs(sim2.𝒪est[:final] - 1.0) < 0.3
 sim2 = analyticless_test_convergence(
     dts, prob,
     ImplicitRKMil(symplectic = true, theta = 1 / 2),
-    test_dt, trajectories = 300, use_noise_grid = false
+    test_dt, trajectories = 300, use_noise_grid = false, verbose = false
 )
 @test abs(sim2.𝒪est[:final] - 1.0) < 0.3
 sim2 = analyticless_test_convergence(
@@ -175,17 +176,17 @@ sim2 = analyticless_test_convergence(
         interpretation = SciMLBase.AlgorithmInterpretation.Stratonovich,
         symplectic = true, theta = 1 / 2
     ),
-    test_dt, trajectories = 300, use_noise_grid = false
+    test_dt, trajectories = 300, use_noise_grid = false, verbose = false
 )
 @test abs(sim2.𝒪est[:final] - 1.0) < 0.3
 sim2 = analyticless_test_convergence(
     dts, prob, ISSEulerHeun(), test_dt, trajectories = 300,
-    use_noise_grid = false
+    use_noise_grid = false, verbose = false
 )
 @test abs(sim2.𝒪est[:final] - 1.0) < 0.3
 sim2 = analyticless_test_convergence(
     dts, prob,
     ISSEulerHeun(symplectic = true, theta = 1 / 2),
-    test_dt, trajectories = 300, use_noise_grid = false
+    test_dt, trajectories = 300, use_noise_grid = false, verbose = false
 )
 @test abs(sim2.𝒪est[:final] - 1.0) < 0.3

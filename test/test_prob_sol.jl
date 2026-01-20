@@ -114,37 +114,38 @@ for i in 1:5
 end
 
 # Test Implicit methods
+# Note: verbose=false suppresses Newton iteration warnings from nonlinear solver
 println("implicit methods")
-sol = @test_nowarn solve(prob, ImplicitEM(), dt = 0.01)
+sol = @test_nowarn solve(prob, ImplicitEM(), dt = 0.01, verbose = false)
 @test sol.u[end] != zeros(1)
-sol = @test_nowarn solve(prob, ImplicitEM(symplectic = true, theta = 1 / 2), dt = 0.01)
+sol = @test_nowarn solve(prob, ImplicitEM(symplectic = true, theta = 1 / 2), dt = 0.01, verbose = false)
 @test sol.u[end] != zeros(1)
-sol = @test_nowarn solve(prob, ImplicitEulerHeun(), dt = 0.01)
+sol = @test_nowarn solve(prob, ImplicitEulerHeun(), dt = 0.01, verbose = false)
 @test sol.u[end] != zeros(1)
 sol = @test_nowarn solve(
     prob, ImplicitEulerHeun(symplectic = true, theta = 1 / 2),
-    dt = 0.01
+    dt = 0.01, verbose = false
 )
 @test sol.u[end] != zeros(1)
-sol = @test_nowarn solve(prob, ImplicitRKMil(), dt = 0.01)
+sol = @test_nowarn solve(prob, ImplicitRKMil(), dt = 0.01, verbose = false)
 @test sol.u[end] != zeros(1)
-sol = @test_nowarn solve(prob, ImplicitRKMil(symplectic = true, theta = 1 / 2), dt = 0.01)
+sol = @test_nowarn solve(prob, ImplicitRKMil(symplectic = true, theta = 1 / 2), dt = 0.01, verbose = false)
 @test sol.u[end] != zeros(1)
 sol = @test_nowarn solve(
     prob,
     ImplicitRKMil(
         interpretation = SciMLBase.AlgorithmInterpretation.Stratonovich, symplectic = true,
         theta = 1 / 2
-    ), dt = 0.01
+    ), dt = 0.01, verbose = false
 )
 @test sol.u[end] != zeros(1)
-sol = @test_nowarn solve(prob, ISSEM(), dt = 0.01)
+sol = @test_nowarn solve(prob, ISSEM(), dt = 0.01, verbose = false)
 @test sol.u[end] != zeros(1)
-sol = @test_nowarn solve(prob, ISSEM(symplectic = true, theta = 1 / 2), dt = 0.01)
+sol = @test_nowarn solve(prob, ISSEM(symplectic = true, theta = 1 / 2), dt = 0.01, verbose = false)
 @test sol.u[end] != zeros(1)
-sol = @test_nowarn solve(prob, ISSEulerHeun(), dt = 0.01)
+sol = @test_nowarn solve(prob, ISSEulerHeun(), dt = 0.01, verbose = false)
 @test sol.u[end] != zeros(1)
-sol = @test_nowarn solve(prob, ISSEulerHeun(symplectic = true, theta = 1 / 2), dt = 0.01)
+sol = @test_nowarn solve(prob, ISSEulerHeun(symplectic = true, theta = 1 / 2), dt = 0.01, verbose = false)
 @test sol.u[end] != zeros(1)
-sol = @test_nowarn solve(prob, SKenCarp(), dt = 0.01)
+sol = @test_nowarn solve(prob, SKenCarp(), dt = 0.01, verbose = false)
 @test sol.u[end] != zeros(1)
