@@ -467,7 +467,7 @@ function DiffEqBase.__init(
         dense, save_on, save_start, save_end, save_end_user,
         save_noise,
         callbacks_internal, isoutofdomain, unstable_check,
-        verbose, calck, force_dtmin,
+        verbose_internal, calck, force_dtmin,
         advance_to_tstop, stop_at_next_tstop
     )
 
