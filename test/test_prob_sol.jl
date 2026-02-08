@@ -109,7 +109,7 @@ sol = @test_nowarn solve(prob, SKSROCK(; post_processing = true), dt = 0.01)
 sol = @test_nowarn solve(prob, TangXiaoSROCK2(), dt = 0.01)
 @test sol.u[end] != zeros(1)
 for i in 1:5
-    sol = @test_nowarn solve(prob, TangXiaoSROCK2(version_num = i), dt = 0.01)
+    local sol = @test_nowarn solve(prob, TangXiaoSROCK2(version_num = i), dt = 0.01)
     @test sol.u[end] != zeros(1)
 end
 
