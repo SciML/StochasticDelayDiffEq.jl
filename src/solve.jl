@@ -99,14 +99,14 @@ function DiffEqBase.__init(
     #end
 
     if haskey(kwargs, :initial_order)
-        @warn "initial_order has been deprecated. Please specify order_discontinuity_t0 in the DDEProblem instead."
+        Base.depwarn("initial_order has been deprecated. Please specify order_discontinuity_t0 in the DDEProblem instead.", :init)
         order_discontinuity_t0 = kwargs[:initial_order]
     else
         order_discontinuity_t0 = prob.order_discontinuity_t0
     end
 
     if haskey(kwargs, :minimal_solution)
-        @warn "minimal_solution is ignored"
+        Base.depwarn("minimal_solution is ignored", :init)
     end
 
     progress && @logmsg(LogLevel(-1), progress_name, _id = progress_id, progress = 0)
