@@ -414,12 +414,6 @@ function DiffEqBase.__init(
         f_with_history, t, dt, Val{isinplace(prob)}, verbose_internal
     )
 
-    # id = StochasticDiffEq.LinearInterpolationData(timeseries,ts)
-    id = StochasticDiffEq.LinearInterpolationData(
-        sde_integrator.sol.u,
-        sde_integrator.sol.t
-    )
-
     save_end_user = save_end
     save_end = save_end === nothing ?
         save_everystep || isempty(saveat) || saveat isa Number ||
@@ -479,7 +473,7 @@ function DiffEqBase.__init(
             sde_integrator.sol.u, W = W,
             stats = stats, saved_subsystem = saved_subsystem,
             calculate_error = false, alg_choice = alg_choice,
-            interp = id, dense = dense, seed = _seed
+            dense = dense, seed = _seed
         )
         # separate statistics of the integrator and the history
     else
@@ -489,7 +483,7 @@ function DiffEqBase.__init(
             sde_integrator.sol.u, W = W,
             stats = stats, saved_subsystem = saved_subsystem,
             calculate_error = false,
-            interp = id, dense = dense, seed = _seed
+            dense = dense, seed = _seed
         )
         # separate statistics of the integrator and the history
     end

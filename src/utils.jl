@@ -192,8 +192,6 @@ function build_history_function(
         t0, dt, Val{isinplace(prob)}, verbose
     )
 
-    # build dense interpolation of history
-    id = StochasticDiffEq.LinearInterpolationData(sde_timeseries, sde_ts)
     if typeof(getalg(alg)) <: StochasticDiffEq.StochasticDiffEqCompositeAlgorithm
         alg_choice = Int[]
         sde_sol = DiffEqBase.build_solution(
@@ -201,14 +199,14 @@ function build_history_function(
             stats = DiffEqBase.Stats(0),
             calculate_error = false,
             alg_choice = alg_choice,
-            interp = id, dense = dense, seed = _seed
+            dense = dense, seed = _seed
         )
     else
         sde_sol = DiffEqBase.build_solution(
             prob, alg, sde_ts, sde_timeseries, W = W,
             stats = DiffEqBase.Stats(0),
             calculate_error = false,
-            interp = id, dense = dense, seed = _seed
+            dense = dense, seed = _seed
         )
     end
 
