@@ -5,9 +5,9 @@
 [![codecov](https://codecov.io/gh/SciML/StochasticDelayDiffEq.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/SciML/StochasticDelayDiffEq.jl)
 [![Coverage Status](https://coveralls.io/repos/github/SciML/StochasticDelayDiffEq.jl/badge.svg?branch=master)](https://coveralls.io/github/SciML/StochasticDelayDiffEq.jl?branch=master)
 
-## Update
-
-This package was deprecated with the OrdinaryDiffEq v7. Now DelayDiffEq.jl + StochasticDiffEq.jl is all you need!
+> [!IMPORTANT] 
+>
+> This package was deprecated with the OrdinaryDiffEq v7. Now DelayDiffEq.jl + StochasticDiffEq.jl is all you need!
 
 ## Previous Stuff
 
